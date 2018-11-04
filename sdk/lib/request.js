@@ -55,7 +55,11 @@ const unsafeRequest = (method, host, path, postObj, headers) => {
                 });
                 res.on('end', () => {
                     if(res.statusCode >= 200 && res.statusCode < 400){
-                        resolve(body);
+                        try{
+                            resolve(JSON.parse(body));
+                        }catch(e) {
+                            resolve(body)
+                        }
                     } else {
                         console.error({status: res.statusCode, body: body})
                         reject(body)
