@@ -1,0 +1,168 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: netrosa-api # NOTE: update this with your service name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  userPoolId: us-east-1_ucyYosvk8
+  appClientId: 3qo1dhj032rhdmqkj3usqkgd13
+
+functions:
+  adminAuthorizer:
+    role: adminAuthorizerRole
+    handler: api-admin/authorizer.authorize
+    environment:
+      region: ${self:provider.region}
+      appClientId: ${self:provider.appClientId}
+      userPoolId: ${self:provider.userPoolId}
+
+  formUpload:
+    handler: api-admin/forms.createForm
+    role: adminApiRole
+    events:
+      - http:
+          path: form
+          method: post
+          cors: true
+          private: true
+          authorizer: adminAuthorizer
+
+  formList:
+    handler: api-admin/forms.formList
+    role: adminApiRole
+    events:
+      - http:
+          path: form
+          method: get
+          cors: true
+          private: true
+          authorizer: adminAuthorizer
+
+  getForm:
+    handler: api-admin/forms.getForm
+    role: adminApiRole
+    events:
+      - http:
+          path: form/{id}
+          method: get
+          cors: true
+          private: true
+          authorizer: adminAuthorizer
+
+resources:
+  Resources:
+    adminAuthorizerRole:
+      Type: AWS::IAM::Role
+      Properties:
+        Path: /api/admin/authorizer/
+        RoleName: nrAdminAuthorizerPolicyRole_${self:provider.stage}
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: nrAdminAuthorizerPolicy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                  - Effect: Allow 
+                    Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                    Resource: 
+                    - 'Fn::Join':
+                      - ':'
+                      -
+                        - 'arn:aws:logs'
+                        - Ref: 'AWS::Region'
+                        - Ref: 'AWS::AccountId'
+                        - 'log-group:/aws/lambda/*:*:*'
+                  - Effect: "Allow"
+                    Action:
+                      - "s3:PutObject"
+                    Resource:
+                      Fn::Join:
+                        - ""
+                        - - "arn:aws:s3:::"
+                          - "Ref" : "ServerlessDeploymentBucket"
+                  - Effect: Allow
+                    Action:
+                      - cognito-idp:AdminInitiateAuth
+                    Resource: "arn:aws:cognito-idp:us-east-1:891335278704:userpool/${self:provider.userPoolId}"   
+
+    adminApiRole:
+      Type: AWS::IAM::Role
+      Properties:
+        Path: /api/netrosa/admin/
+        RoleName: ApiNetrosaAdminRole_${self:provider.stage}
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: netrosaAdminPolicy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                  - Effect: Allow 
+                    Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                    Resource: 
+                    - 'Fn::Join':
+                      - ':'
+                      -
+                        - 'arn:aws:logs'
+                        - Ref: 'AWS::Region'
+                        - Ref: 'AWS::AccountId'
+                        - 'log-group:/aws/lambda/*:*:*'
+                  - Effect: "Allow"
+                    Action:
+                      - "s3:PutObject"
+                    Resource:
+                      Fn::Join:
+                        - ""
+                        - - "arn:aws:s3:::"
+                          - "Ref" : "ServerlessDeploymentBucket"
+                  - Effect: Allow
+                    Action:
+                      - dynamodb:PutItem
+                      - dynamodb:GetItem
+                      - dynamodb:Query
+                      - dynamodb:Scan
+                    Resource: "arn:aws:dynamodb:${self:provider.region}:891335278704:table/forms"
+                  - Effect: Allow
+                    Action:
+                      - "s3:PutObject"
+                      - "s3:GetObject"
+                    Resource: "arn:aws:s3:::netvote-ipfs/*"     
+
+  
