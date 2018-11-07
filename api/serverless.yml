@@ -57,6 +57,17 @@ functions:
           private: true
           authorizer: adminAuthorizer
 
+  formAddSubmitterKeys:
+    handler: api-admin/add-keys.addKeys
+    role: adminApiRole
+    events:
+      - http:
+          path: form/{id}/keys
+          method: post
+          cors: true
+          private: true
+          authorizer: adminAuthorizer
+
   formList:
     handler: api-admin/forms.formList
     role: adminApiRole
@@ -172,6 +183,10 @@ resources:
                       - dynamodb:Scan
                       - dynamodb:UpdateItem
                     Resource: "arn:aws:dynamodb:${self:provider.region}:891335278704:table/forms"
+                  - Effect: Allow
+                    Action:
+                      - dynamodb:PutItem
+                    Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/formSubmitterKeys"
                   - Effect: Allow
                     Action:
                       - "s3:PutObject"

@@ -77,6 +77,18 @@ module.exports = {
       status:"stopped"
     })
   },
+  AddKeys: async(id, keys) => {
+    checkReady();
+    return await post(`/form/${id}/keys`, {
+      hashedKeys: keys
+    })
+  },
+  GenerateKeys: async(id, count) => {
+    checkReady();
+    return await post(`/form/${id}/keys`, {
+      generate: count
+    })
+  },
   CloseForm: async(id) => {
     checkReady();
     return await post(`/form/${id}/status`, {

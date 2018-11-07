@@ -62,6 +62,12 @@ describe(`Form Admin APIs`, function() {
         assert.equal("open", res.formStatus, "should be open")
     });
 
+    it('should generate keys', async()=>{
+        let k = await nv.GenerateKeys(form.formId, 5);
+        console.log(k);
+        assert.equal(k.keys.length, 5, "should have 5 keys")
+    });
+
     it('should close form', async()=>{
         await nv.StopForm(form.formId);
         await nv.CloseForm(form.formId);

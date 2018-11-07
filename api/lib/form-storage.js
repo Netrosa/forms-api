@@ -4,6 +4,7 @@ const ipfs = require("./ipfs");
 const docClient = new AWS.DynamoDB.DocumentClient();
 
 const FORM_TABLE = "forms"
+const FORM_KEY_TABLE = "formSubmitterKeys";
 
 const getForm = async (user, id) => {
     let params = {
@@ -72,9 +73,20 @@ const getFormList = async (user) => {
     return results.Items;
 }
 
+const addSubmitterKey = async (keyObj) => {
+    keyObj.createdAt = new Date().getTime();
+    let params = {
+        TableName: FORM_KEY_TABLE,
+        Item: keyObj
+    }
+    await docClient.put(params).promise();
+    return keyObj;
+}
+
 module.exports = {
     putForm: putForm,
     getForm: getForm,
     getFormList: getFormList,
-    setStatus: setStatus
+    setStatus: setStatus,
+    addSubmitterKey: addSubmitterKey
 }
