@@ -24,6 +24,7 @@ provider:
   region: ${opt:region, 'us-east-1'}
   userPoolId: us-east-1_ucyYosvk8
   appClientId: 3qo1dhj032rhdmqkj3usqkgd13
+  timeout: 10
 
 functions:
   adminAuthorizer:
