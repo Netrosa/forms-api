@@ -6,6 +6,7 @@ const validations = require("../lib/validations")
 const FORM_SCHEMA = Joi.object().keys({
     name: Joi.string().required(),
     form: validations.FORM_SCHEMA,
+    continuousReveal: Joi.boolean().default(false),
     network: Joi.string().only("netvote", "ropsten").required(),
 })
 
@@ -26,6 +27,7 @@ module.exports.createForm = async (event, context) => {
         let payload = {
             formId: obj.formId,
             company: user.company,
+            continuousReveal: params.continuousReveal,
             network: params.network
         }
 
