@@ -16,8 +16,8 @@ module.exports.createForm = async (event, context) => {
     try {
         let params = await utils.validate(event.body, FORM_SCHEMA);
 
-        if(params.network === "mainnet"){
-            if(!user.mainnet){
+        if (params.network === "mainnet") {
+            if (!user.mainnet) {
                 return utils.error(403, "user does not have permission to use mainnet")
             }
         }
@@ -37,7 +37,7 @@ module.exports.createForm = async (event, context) => {
         await utils.asyncLambda("netrosa-ethereum-prod-create-form", payload);
 
         return utils.success(obj);
-    } catch(e){ 
+    } catch (e) {
         console.log(e);
         return utils.error(400, e.message)
     }
@@ -48,7 +48,7 @@ module.exports.getForm = async (event, context) => {
         let user = utils.getUser(event);
         let obj = await forms.getForm(user, event.pathParameters.id)
         return utils.success(obj);
-    } catch(e){ 
+    } catch (e) {
         console.log(e);
         return utils.error(500, e.message)
     }
@@ -59,8 +59,8 @@ module.exports.formList = async (event, context) => {
         let user = utils.getUser(event);
         let obj = await forms.getFormList(user)
         return utils.success(obj);
-    } catch(e){ 
+    } catch (e) {
         console.log(e);
         return utils.error(500, e.message)
-    } 
+    }
 }

@@ -16,17 +16,22 @@ const getForm = async (user, id) => {
     
     let res = await docClient.get(params).promise();
     let formObj = res.Item;
-    let form = await ipfs.getJson(formObj.ipfsHash);
-    return {
-        "company": formObj.company,
-        "formId": formObj.formId,
-        "name": formObj.name,
-        "ipfsHash": formObj.ipfsHash,
-        "form": form,
-        "createdAt": formObj.createdAt,
-        "network": formObj.network,
-        "createdBy": formObj.createdBy
+    return formObj;
+}
+
+const setStatus = async (user, id, status) => {
+    let params = {
+        TableName: FORM_TABLE,
+        Key: {
+            "company": user.company,
+            "formId": id
+        },
+        UpdateExpression: "set formStatus = :s",
+        ExpressionAttributeValues:{
+            ":s": status
+        }
     }
+    await docClient.update(params).promise();
 }
 
 const putForm = async (user, form) => {
@@ -42,6 +47,8 @@ const putForm = async (user, form) => {
         "network": form.network,
         "createdBy": user.email,
         "authType": form.authType,
+        "formStatus": "building",
+        "txStatus": "pending",
         "mode": mode
     };
     let params = {
@@ -68,5 +75,6 @@ const getFormList = async (user) => {
 module.exports = {
     putForm: putForm,
     getForm: getForm,
-    getFormList: getFormList
+    getFormList: getFormList,
+    setStatus: setStatus
 }

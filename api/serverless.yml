@@ -24,7 +24,7 @@ provider:
   region: ${opt:region, 'us-east-1'}
   userPoolId: us-east-1_ucyYosvk8
   appClientId: 3qo1dhj032rhdmqkj3usqkgd13
-  timeout: 10
+  timeout: 30
 
 functions:
   adminAuthorizer:
@@ -41,6 +41,17 @@ functions:
     events:
       - http:
           path: form
+          method: post
+          cors: true
+          private: true
+          authorizer: adminAuthorizer
+
+  formSetStatus:
+    handler: api-admin/form-status.setStatus
+    role: adminApiRole
+    events:
+      - http:
+          path: form/{id}/status
           method: post
           cors: true
           private: true
@@ -159,6 +170,7 @@ resources:
                       - dynamodb:GetItem
                       - dynamodb:Query
                       - dynamodb:Scan
+                      - dynamodb:UpdateItem
                     Resource: "arn:aws:dynamodb:${self:provider.region}:891335278704:table/forms"
                   - Effect: Allow
                     Action:
@@ -168,6 +180,6 @@ resources:
                   - Effect: Allow
                     Action:
                       - lambda:InvokeFunction
-                    Resource: "arn:aws:lambda:us-east-1:891335278704:function:netrosa-ethereum-prod-create-form"
+                    Resource: "arn:aws:lambda:us-east-1:891335278704:function:netrosa-ethereum-*"
 
   
