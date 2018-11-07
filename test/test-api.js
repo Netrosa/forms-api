@@ -21,7 +21,9 @@ describe(`Form Admin APIs`, function() {
             form: FORM_EXAMPLES.ALL_TYPES,
             name: "test form",
             network: "netvote",
-            continuousReveal: true
+            continuousReveal: true,
+            authType: "key",
+            test: true
         })
         form = res;
         //TODO: verify more than this

@@ -32,6 +32,7 @@ const getForm = async (user, id) => {
 const putForm = async (user, form) => {
     let id = uuid();
     let hash = await ipfs.save(form.form);
+    let mode = form.test ? "TEST" : "PROD";
     let item = {
         "company": user.company,
         "formId": id,
@@ -39,7 +40,9 @@ const putForm = async (user, form) => {
         "ipfsHash": hash,
         "createdAt": new Date().getTime(),
         "network": form.network,
-        "createdBy": user.email
+        "createdBy": user.email,
+        "authType": form.authType,
+        "mode": mode
     };
     let params = {
         TableName: FORM_TABLE,

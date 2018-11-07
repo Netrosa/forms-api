@@ -8,6 +8,8 @@ const FORM_SCHEMA = Joi.object().keys({
     form: validations.FORM_SCHEMA,
     continuousReveal: Joi.boolean().default(false),
     network: Joi.string().only("netvote", "ropsten").required(),
+    authType: Joi.string().only("key", "jwt").default("key"),
+    test: Joi.boolean().default(false)
 })
 
 module.exports.createForm = async (event, context) => {
@@ -28,7 +30,8 @@ module.exports.createForm = async (event, context) => {
             formId: obj.formId,
             company: user.company,
             continuousReveal: params.continuousReveal,
-            network: params.network
+            network: params.network,
+            authType: params.authType
         }
 
         await utils.asyncLambda("netrosa-ethereum-prod-create-form", payload);
