@@ -10,6 +10,8 @@ let BASE_URL;
 let API_KEY;
 let ready=false;
 
+const snooze = ms => new Promise(resolve => setTimeout(resolve, ms)); 
+
 let authBasic = () => {
   let token = new Buffer(`${ID}:${SECRET}`).toString("base64");
   return token;
@@ -62,6 +64,39 @@ module.exports = {
 	CreateForm: async(payload) => {
     checkReady();
     return await post("/form", payload)
+  },
+  OpenForm: async(id) => {
+    checkReady();
+    return await post(`/form/${id}/status`, {
+      status:"open"
+    })
+  },
+  StopForm: async(id) => {
+    checkReady();
+    return await post(`/form/${id}/status`, {
+      status:"stopped"
+    })
+  },
+  CloseForm: async(id) => {
+    checkReady();
+    return await post(`/form/${id}/status`, {
+      status:"closed"
+    })
+  },
+  PollForStatus: async(id, status, timeout) => {
+    checkReady();
+    let now = new Date().getTime();
+    let expired = now + timeout;
+
+    while(new Date().getTime() < expired){
+      let job = await get(`/form/${id}`)
+      if(job.formStatus === status){
+        return true;
+      }
+      //wait 2 seconds
+      await snooze(2000);
+    }
+    throw new Error("timeout occured while polling for job");
   },
   GetFormList: async(id, obj) => {
     checkReady();
