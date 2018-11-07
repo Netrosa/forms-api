@@ -11,12 +11,7 @@
   },
   "author": "steven@netvote.io",
   "license": "GPL-3.0",
-  "dependencies": {
-    "ipfs-mini": "^1.1.2",
-    "joi": "^14.0.4",
-    "js2xmlparser": "^3.0.0",
-    "node-jose": "^1.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "mocha": "^5.2.0",
     "xml2js": "^0.4.19"

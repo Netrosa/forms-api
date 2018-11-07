@@ -1,5 +1,5 @@
-const utils = require('../lib/utils')
-const validations = require('../lib/validations')
+const utils = require('../api/lib/utils')
+const validations = require('../api/lib/validations')
 
 
 describe('Forms Schema', function() {

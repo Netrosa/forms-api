@@ -1,5 +1,5 @@
 'use strict'
-
+const AWS = require("aws-sdk");
 const Joi = require('joi');
 
 
@@ -8,6 +8,29 @@ const defaultHeaders = {
     "Access-Control-Allow-Credentials" : true,
     "Content-Type": "text/xml"
 };
+
+const asyncLambda = (name, payload) => {
+    return new Promise((resolve, reject) => {
+        try{
+            const lambda = new AWS.Lambda({ region: "us-east-1", apiVersion: '2015-03-31' });
+            const lambdaParams = {
+                FunctionName: name,
+                InvocationType: 'Event',
+                LogType: 'None',
+                Payload: JSON.stringify(payload)
+            };
+            lambda.invoke(lambdaParams, function(err, data){
+                if(err){
+                    reject(err)
+                } else{
+                    resolve(data);
+                }
+            });
+        }catch(e){
+            reject(e);
+        }
+    })
+}
 
 const getUser = (event) => {
     let id = event.requestContext.authorizer;
@@ -59,5 +82,6 @@ module.exports = {
     success: success,
     error: error,
     getUser: getUser,
-    validate: validate
+    validate: validate,
+    asyncLambda: asyncLambda
 }
