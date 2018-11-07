@@ -20,7 +20,8 @@ describe(`Form Admin APIs`, function() {
         let res = await nv.CreateForm({
             form: FORM_EXAMPLES.ALL_TYPES,
             name: "test form",
-            network: "netvote"
+            network: "netvote",
+            continuousReveal: true
         })
         form = res;
         //TODO: verify more than this
