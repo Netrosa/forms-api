@@ -28,6 +28,7 @@ describe(`Form Admin APIs`, function() {
         form = res;
         //TODO: verify more than this
         assert.equal(res != null, true, "res should be set")
+        console.log(form.formId);
         await nv.PollForStatus(form.formId, "ready", 60000);
     });
 
@@ -64,7 +65,6 @@ describe(`Form Admin APIs`, function() {
 
     it('should generate keys', async()=>{
         let k = await nv.GenerateKeys(form.formId, 5);
-        console.log(k);
         assert.equal(k.keys.length, 5, "should have 5 keys")
     });
 

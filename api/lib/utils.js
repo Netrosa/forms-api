@@ -1,6 +1,7 @@
 'use strict'
 const AWS = require("aws-sdk");
 const Joi = require('joi');
+const crypto = require('crypto');
 
 
 const defaultHeaders = {
@@ -78,10 +79,18 @@ const validate = (params, schema) => {
     })
   }
 
+const sha256Hash = (str) => {
+    let hash = crypto.createHash("sha256")
+    hash.update(str);
+    return hash.digest().toString("base64");
+}
+
+
 module.exports = {
     success: success,
     error: error,
     getUser: getUser,
     validate: validate,
-    asyncLambda: asyncLambda
+    asyncLambda: asyncLambda,
+    sha256Hash: sha256Hash
 }

@@ -79,7 +79,7 @@ const generateKeys = async (event, params) => {
         saves.push(forms.addSubmitterKey({
             company: user.company,
             formId: formId,
-            hashedKey: keys[i],
+            hashedKey: utils.sha256Hash(key),
             user: user,
             enabled: true
         }))
