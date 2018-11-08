@@ -62,5 +62,12 @@ module.exports = {
       "Authorization": `Bearer ${token}`
     }
     return await post(`/form/${formId}/auth/qr`, null, headers)
+  },
+  SubmitForm: async(formId, payload, token) => {
+    checkReady()
+    let headers = {
+      "Authorization": `Bearer ${token}`
+    }
+    return await post(`/form/${formId}/submission`, payload, headers)
   }
 }

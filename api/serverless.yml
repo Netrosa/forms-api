@@ -100,6 +100,16 @@ functions:
           cors: true
           private: true
 
+  submitForm:
+    handler: api-submitter/add-submission.add
+    role: submitterApiRole
+    events:
+      - http:
+          path: form/{id}/submission
+          method: post
+          cors: true
+          private: true
+
 resources:
   Resources:
     adminAuthorizerRole:
@@ -269,13 +279,17 @@ resources:
                     Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/formKeys"
                   - Effect: Allow
                     Action:
+                      - dynamodb:PutItem
+                    Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/formSubmissions"
+                  - Effect: Allow
+                    Action:
                       - "s3:PutObject"
                       - "s3:GetObject"
                     Resource: "arn:aws:s3:::netvote-ipfs/*"     
                   - Effect: Allow
                     Action:
                       - lambda:InvokeFunction
-                    Resource: "arn:aws:lambda:us-east-1:891335278704:function:netrosa-ethereum-submit-entry"
+                    Resource: "arn:aws:lambda:us-east-1:891335278704:function:netrosa-ethereum-prod-form-add-entry"
                   - Effect: Allow
                     Action:
                       - kms:Decrypt

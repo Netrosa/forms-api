@@ -2,6 +2,7 @@ const AWS = require("aws-sdk")
 const crypto = require('crypto');
 const nJwt = require('njwt');
 const ursa = require('ursa');
+const sha3 = require('js-sha3')
 
 const docClient = new AWS.DynamoDB.DocumentClient();
 const kmsClient = new AWS.KMS();
@@ -58,7 +59,8 @@ const getJwtPublicKey = async (formId) => {
 
 const anonymize = async (formId, text) => {
     let secret = await getKey(formId, KEY_TYPE.ANONYMIZE);
-    return toHmac(text, secret)
+    let hashed = toHmac(text, secret)
+    return `0x${sha3.keccak256(hashed)}`;
 }
 
 const verifyJwt = async (token) => {

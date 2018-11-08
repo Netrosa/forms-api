@@ -4,6 +4,7 @@ const apis = require("../sdk")
 
 const API_VERSION = process.env.NETROSA_API_VERSION || "dev";
 
+
 const adminApis = apis.initAdminClient(
     process.env.NETROSA_API_KEY, 
     process.env.NETROSA_API_ID, 
@@ -69,24 +70,30 @@ describe(`Form Admin APIs`, function() {
     });
 
     it('should generate keys', async()=>{
-        let k = await adminApis.GenerateKeys(form.formId, 5);
-        assert.equal(k.keys.length, 5, "should have 5 keys")
+        let k = await adminApis.GenerateKeys(form.formId, 10);
+        assert.equal(k.keys.length, 10, "should have 10 keys")
         keys = k.keys;
         console.log(keys);
     });
 
-    it('should get voter jwt token', async()=>{
+    it('should get voter jwt token and submit', async()=>{
         let res = await publicApis.GetJwtToken(form.formId, keys[0])
-        console.log(res);
+        assert.equal(res.token != null, true, "token should be set")
+        let submissionResult = await publicApis.SubmitForm(form.formId, {
+            value: { signatureSeed: "seed", test: true },
+            proof: "abc123",
+            publicKey: new Buffer("test").toString("base64"),
+        }, res.token)
+        console.log(submissionResult);
     })
 
-    it('should close form', async()=>{
-        await adminApis.StopForm(form.formId);
-        await adminApis.CloseForm(form.formId);
-        let res = await adminApis.GetForm(form.formId)
-        assert.equal("closing", res.formStatus, "should be closing")
-        await adminApis.PollForStatus(form.formId, "closed", 60000);
-    });
+    // it('should close form', async()=>{
+    //     await adminApis.StopForm(form.formId);
+    //     await adminApis.CloseForm(form.formId);
+    //     let res = await adminApis.GetForm(form.formId)
+    //     assert.equal("closing", res.formStatus, "should be closing")
+    //     await adminApis.PollForStatus(form.formId, "closed", 60000);
+    // });
 
     
 
