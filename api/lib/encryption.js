@@ -75,7 +75,7 @@ const verifyJwt = async (token) => {
                 resolve({
                     subId: verified.body.sub,
                     formId: verified.body.scope,
-                    tokenId: verified.body.jti
+                    tokenId: `${verified.body.sub}${verified.body.jti}`
                 }) 
             }
         });
