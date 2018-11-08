@@ -20,6 +20,22 @@ const getForm = async (user, id) => {
     return formObj;
 }
 
+const getFormById = async (id) => {
+    let params = {
+        TableName: FORM_TABLE,
+        IndexName: "formId-createdAt-index",
+        KeyConditionExpression: "formId = :fid",
+        ExpressionAttributeValues: {
+            ":fid": id
+        },
+    }
+    let res = await docClient.query(params).promise();
+    if(res.Items.length > 0){
+        return res.Items[0]
+    }
+    return null;
+}
+
 const setStatus = async (user, id, status) => {
     let params = {
         TableName: FORM_TABLE,
@@ -86,6 +102,7 @@ const addSubmitterKey = async (keyObj) => {
 module.exports = {
     putForm: putForm,
     getForm: getForm,
+    getFormById: getFormById,
     getFormList: getFormList,
     setStatus: setStatus,
     addSubmitterKey: addSubmitterKey

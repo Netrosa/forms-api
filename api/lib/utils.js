@@ -2,7 +2,7 @@
 const AWS = require("aws-sdk");
 const Joi = require('joi');
 const crypto = require('crypto');
-
+const QRCode = require('qrcode');
 
 const defaultHeaders = {
     "Access-Control-Allow-Origin" : "*", 
@@ -31,6 +31,21 @@ const asyncLambda = (name, payload) => {
             reject(e);
         }
     })
+}
+
+const qr = (obj) => {
+    return new Promise(function (resolve, reject) {
+        QRCode.toDataURL(JSON.stringify(obj), {
+            color: {
+                dark: "#0D364B",
+                light: "#ffffff"
+            }
+        }, function (err, url) {
+            resolve({
+                qr: url
+            });
+        });
+    });
 }
 
 const getUser = (event) => {
@@ -92,5 +107,6 @@ module.exports = {
     getUser: getUser,
     validate: validate,
     asyncLambda: asyncLambda,
-    sha256Hash: sha256Hash
+    sha256Hash: sha256Hash,
+    qr: qr
 }

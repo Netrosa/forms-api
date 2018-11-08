@@ -45,8 +45,7 @@ module.exports.createForm = async (event, context) => {
 
 module.exports.getForm = async (event, context) => {
     try {
-        let user = utils.getUser(event);
-        let obj = await forms.getForm(user, event.pathParameters.id)
+        let obj = await forms.getFormById(event.pathParameters.id)
         return utils.success(obj);
     } catch (e) {
         console.log(e);
