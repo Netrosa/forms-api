@@ -120,6 +120,10 @@ const checkSignature = async (text, publicKey, signature) => {
     return pub.hashAndVerify('md5', new Buffer(text), signature, "base64");
 }
 
+const getDecryptionKey = async(formId) => {
+    return await getKey(formId, KEY_TYPE.ENCRYPTION_PRIVATE)
+}
+
 module.exports =  {
     KEY_TYPE: KEY_TYPE,
     anonymize: anonymize,
@@ -129,5 +133,6 @@ module.exports =  {
     checkSignature: checkSignature,
     createJwt: createJwt,
     getJwtPublicKey: getJwtPublicKey,
-    encrypt: encrypt
+    encrypt: encrypt,
+    getDecryptionKey: getDecryptionKey
 }

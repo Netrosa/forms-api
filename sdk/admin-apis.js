@@ -49,6 +49,8 @@ const required = (name, value) => {
   }
 }
 
+const decryptionKeys = {}
+
 module.exports = {
   Init: async(params) => {
     required("id", params.id);
@@ -95,6 +97,16 @@ module.exports = {
       status:"closed"
     })
   },
+  GetDecryptionKey: async(id) => {
+    checkReady();
+    if(!decryptionKeys[id]){
+      let resp = await get(`/form/${id}/decryptionkey`)
+      if(resp.key) {
+        decryptionKeys[id] = resp.key;
+      }
+    }
+    return decryptionKeys[id]
+  },
   PollForStatus: async(id, status, timeout) => {
     checkReady();
     let now = new Date().getTime();
@@ -110,9 +122,9 @@ module.exports = {
     }
     throw new Error("timeout occured while polling for job");
   },
-  GetFormList: async(id, obj) => {
+  GetFormList: async() => {
     checkReady();
-    return await get(`/form`, obj)
+    return await get(`/form`)
   },
   GetForm: async(id) => {
     checkReady();

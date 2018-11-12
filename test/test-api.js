@@ -87,6 +87,11 @@ describe(`Form Admin APIs`, function() {
         console.log(submissionResult);
     })
 
+    it('should get decryption key', async()=>{
+        let k = await adminApis.GetDecryptionKey(form.formId);
+        assert.equal(k != null, true, "should not be null")
+    })
+
     // it('should close form', async()=>{
     //     await adminApis.StopForm(form.formId);
     //     await adminApis.CloseForm(form.formId);
