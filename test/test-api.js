@@ -24,6 +24,7 @@ describe(`Form Admin APIs`, function() {
 
     let form;
     let keys;
+    let subId;
 
     it('should create form', async()=>{
         let res = await adminApis.CreateForm({
@@ -73,10 +74,9 @@ describe(`Form Admin APIs`, function() {
     });
 
     it('should generate keys', async()=>{
-        let k = await adminApis.GenerateKeys(form.formId, 10);
-        assert.equal(k.keys.length, 10, "should have 10 keys")
+        let k = await adminApis.GenerateKeys(form.formId, 3);
+        assert.equal(k.keys.length, 3, "should have 3 keys")
         keys = k.keys;
-        console.log(keys);
     });
 
     it('should get voter jwt token and submit', async()=>{
@@ -87,7 +87,8 @@ describe(`Form Admin APIs`, function() {
             proof: "abc123",
             publicKey: new Buffer("test").toString("base64"),
         }, res.token)
-        console.log(submissionResult);
+        assert.equal(submissionResult.subId != null, true, "subId should be in result");
+        await adminApis.PollSubmissionForStatus(form.formId, submissionResult.subId, "complete", 60000);
     })
 
     it('should get decryption key', async()=>{
@@ -103,6 +104,16 @@ describe(`Form Admin APIs`, function() {
         await adminApis.PollForStatus(form.formId, "closed", 60000);
     });
 
-    
+    it('should export submissions', async() => {
+        let count = 0;
+        let result;
+        await adminApis.ExportSubmissions(form.formId, function(obj){
+            result  =obj;
+            count++;
+        })
+        assert.equal(count, 1, "count should be 1")
+        assert.deepEqual(result.decrypted, { signatureSeed: "seed", test: true }, "submission should be what was sent")
+    })
+
 
 })

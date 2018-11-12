@@ -62,7 +62,7 @@ const getDecryptionKey = async (id) => {
 }
 
 const exportSubmissions = async (id, callback) => {
-  callback = callback || function(str) { console.log(str) }
+  let cb = callback || function(obj) { console.log(obj) }
   let form = await get(`/form/${id}`)
 
   let decryptionKey = await getDecryptionKey(id);
@@ -76,9 +76,16 @@ const exportSubmissions = async (id, callback) => {
     let entryHash = await SubmissionLog.getEntryAt(hashedFormId, i);
     let entry = await getFromIpfs(entryHash);
     let decrypted = crypto.privateDecrypt(new Buffer(decryptionKey, "base64"), new Buffer(entry.value, "base64"))
+
+    let obj = JSON.parse(decrypted.toString("utf8"))
     //TODO: validate proof here
-    callback(decrypted.toString("utf8"))
+    cb({
+      index: i,
+      total: count,
+      decrypted: obj
+    })
   }
+  return true;
 }
 
 const getFromIpfs = async (hash) =>{ 
@@ -126,9 +133,9 @@ module.exports = {
       hashedKeys: keys
     })
   },
-  ExportSubmissions: async(id, callback) => {
+  ExportSubmissions: async(id, submissionCallback) => {
     checkReady();
-    return await exportSubmissions(id, callback);
+    return await exportSubmissions(id, submissionCallback);
   },
   GenerateKeys: async(id, count) => {
     checkReady();
@@ -141,6 +148,28 @@ module.exports = {
     return await post(`/form/${id}/status`, {
       status:"closed"
     })
+  },
+  GetSubmissionStatus: async(id, subId) => {
+    checkReady();
+    return await get(`/form/${id}/submission/${subId}`)
+  },
+  PollSubmissionForStatus: async(id, subId, status, timeout) => {
+    checkReady();
+    let now = new Date().getTime();
+    let expired = now + timeout;
+
+    while(new Date().getTime() < expired){
+      let job = await get(`/form/${id}/submission/${subId}`)
+      if(job.txStatus === status){
+        return true;
+      }
+      if(job.txStatus === "error"){
+        throw new Error(job.errorMessage)
+      }
+      //wait 2 seconds
+      await snooze(2000);
+    }
+    throw new Error("timeout occured while polling for job");
   },
   GetFromIPFS: async(hash) => {
     checkReady();

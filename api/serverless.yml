@@ -68,6 +68,17 @@ functions:
           private: true
           authorizer: adminAuthorizer
 
+  formGetSubmissionById:
+    handler: api-admin/submissions.getById
+    role: adminApiRole
+    events:
+      - http:
+          path: form/{id}/submission/{subId}
+          method: get
+          cors: true
+          private: true
+          authorizer: adminAuthorizer
+
   formGetDecryptionKey:
     handler: api-admin/decryption-key.get
     role: adminApiRole
@@ -244,6 +255,11 @@ resources:
                     Action:
                       - dynamodb:PutItem
                     Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/formSubmitterKeys"
+                  - Effect: Allow
+                    Action:
+                      - dynamodb:GetItem
+                      - dynamodb:Query
+                    Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/formSubmissions"
                   - Effect: Allow
                     Action:
                       - "s3:PutObject"

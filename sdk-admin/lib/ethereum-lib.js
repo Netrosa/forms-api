@@ -41,7 +41,6 @@ const getAbi = async (name, version) => {
     let c = contractCache[url];
     if(!c) {
         c = contract(await rp(url, { json: true }))
-        console.log(`loaded ${name}/${version} from S3`)
     }
     //set every time in case config changed in dynamodb (gas price mainly)
     c.setProvider(web3Provider)
