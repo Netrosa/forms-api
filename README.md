@@ -23,7 +23,7 @@ npm install netrosa-admin-sdk
 ```
 const adminSdk = require("netrosa-admin-sdk")
 
-const adminClient = adminSdk.initAdminClient(
+const adminApis = adminSdk.initAdminClient(
     process.env.NETROSA_API_KEY, 
     process.env.NETROSA_API_ID, 
     process.env.NETROSA_API_SECRET, 
@@ -157,7 +157,7 @@ This can be initialized in a browser using a stack like [Browserify](http://brow
 ```
 const publicSdk = require("netrosa-public-sdk")
 
-const publicApi = publicSdk.initPublicClient(
+const publicApis = publicSdk.initPublicClient(
     process.env.NETROSA_API_KEY, 
 )
 ```
