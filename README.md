@@ -187,7 +187,7 @@ let submissionObject = {
     }
 }
 
-let res = await publicApis.SubmitForm(formId, submissionObject);
+let res = await publicApis.SubmitForm(formId, submissionObject, anonymousToken);
 // returns a res.subId
 
 ```
