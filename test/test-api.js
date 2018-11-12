@@ -92,13 +92,13 @@ describe(`Form Admin APIs`, function() {
         assert.equal(k != null, true, "should not be null")
     })
 
-    // it('should close form', async()=>{
-    //     await adminApis.StopForm(form.formId);
-    //     await adminApis.CloseForm(form.formId);
-    //     let res = await adminApis.GetForm(form.formId)
-    //     assert.equal("closing", res.formStatus, "should be closing")
-    //     await adminApis.PollForStatus(form.formId, "closed", 60000);
-    // });
+    it('should close form', async()=>{
+        await adminApis.StopForm(form.formId);
+        await adminApis.CloseForm(form.formId);
+        let res = await adminApis.GetForm(form.formId)
+        assert.equal("closing", res.formStatus, "should be closing")
+        await adminApis.PollForStatus(form.formId, "closed", 60000);
+    });
 
     
 
