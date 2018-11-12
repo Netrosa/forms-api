@@ -1,6 +1,8 @@
 const AWS = require("aws-sdk")
 const url = require('url');
 const reqApi = require('./lib/request')
+const networks = require('./lib/eth-networks')
+const crypto = require("crypto")
 
 AWS.config.update({ region: 'us-east-1' });
 
@@ -49,6 +51,45 @@ const required = (name, value) => {
   }
 }
 
+const getDecryptionKey = async (id) => {
+  if(!decryptionKeys[id]){
+    let resp = await get(`/form/${id}/decryptionkey`)
+    if(resp.key) {
+      decryptionKeys[id] = resp.key;
+    }
+  }
+  return decryptionKeys[id]
+}
+
+const exportSubmissions = async (id, callback) => {
+  callback = callback || function(str) { console.log(str) }
+  let form = await get(`/form/${id}`)
+
+  let decryptionKey = await getDecryptionKey(id);
+  let provider = await networks.NetvoteProvider(form.network);
+  let SubmissionLog = await provider.SubmissionLog(form.version);
+  let hashedFormId = await provider.sha3(id);
+
+  let count = (await SubmissionLog.getEntriesCount(hashedFormId)).toNumber();
+
+  for(let i=0; i<count; i++){
+    let entryHash = await SubmissionLog.getEntryAt(hashedFormId, i);
+    let entry = await getFromIpfs(entryHash);
+    let decrypted = crypto.privateDecrypt(new Buffer(decryptionKey, "base64"), new Buffer(entry.value, "base64"))
+    //TODO: validate proof here
+    callback(decrypted.toString("utf8"))
+  }
+}
+
+const getFromIpfs = async (hash) =>{ 
+  let res = await get(`/ipfs/${hash}`)
+  try{
+    return JSON.parse(res);
+  }catch(e){
+    return res;
+  }
+}
+
 const decryptionKeys = {}
 
 module.exports = {
@@ -85,6 +126,10 @@ module.exports = {
       hashedKeys: keys
     })
   },
+  ExportSubmissions: async(id, callback) => {
+    checkReady();
+    return await exportSubmissions(id, callback);
+  },
   GenerateKeys: async(id, count) => {
     checkReady();
     return await post(`/form/${id}/keys`, {
@@ -97,15 +142,17 @@ module.exports = {
       status:"closed"
     })
   },
+  GetFromIPFS: async(hash) => {
+    checkReady();
+    return await getFromIpfs(hash)
+  },
+  SaveToIPFS: async(obj) => {
+    checkReady();
+    return await post(`/ipfs`, obj)
+  },
   GetDecryptionKey: async(id) => {
     checkReady();
-    if(!decryptionKeys[id]){
-      let resp = await get(`/form/${id}/decryptionkey`)
-      if(resp.key) {
-        decryptionKeys[id] = resp.key;
-      }
-    }
-    return decryptionKeys[id]
+    return await getDecryptionKey(id);
   },
   PollForStatus: async(id, status, timeout) => {
     checkReady();

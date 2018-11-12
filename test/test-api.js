@@ -1,21 +1,24 @@
 const assert = require('assert');
 const FORM_EXAMPLES = require("./form-examples").FORMS;
-const apis = require("../sdk")
+const adminSdk = require("../sdk-admin")
+const publicSdk = require("../sdk-public")
+
 
 const API_VERSION = process.env.NETROSA_API_VERSION || "dev";
 
 
-const adminApis = apis.initAdminClient(
+const adminApis = adminSdk.initAdminClient(
     process.env.NETROSA_API_KEY, 
     process.env.NETROSA_API_ID, 
     process.env.NETROSA_API_SECRET, 
     API_VERSION
 )
 
-const publicApis = apis.initPublicClient(
+const publicApis = publicSdk.initPublicClient(
     process.env.NETROSA_API_KEY,
     API_VERSION
 )
+
 
 describe(`Form Admin APIs`, function() {
 

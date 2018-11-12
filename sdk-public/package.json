@@ -1,6 +1,6 @@
 {
-  "name": "forms-sdk",
-  "version": "1.0.0",
+  "name": "netrosa-public-sdk",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
