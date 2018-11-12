@@ -12,7 +12,7 @@ Netrosa API
 ## NPM Package
 
 ```
-npm install @netvote/netvote-api-sdk
+npm install netrosa-admin-sdk
 ```
 
 ## Admin SDK
@@ -81,11 +81,10 @@ let exampleForm = {
 // create the form on the netvote blockchain
 let form = await adminApis.CreateForm({
     form: exampleForm,
-    name: "test form",
-    network: "netvote",
-    continuousReveal: true,
-    authType: "key",
-    test: true
+    name: "test form",      // any name
+    network: "netvote",     // netvote, ropsten, or mainnet (permission required)
+    authType: "key",        // key or jwt, (key uses "keys" created via the key creation api)
+    test: true              // no charges for test forms, limited use and may be deleted
 })
 
 let formId = form.formId;
@@ -131,8 +130,8 @@ const sha256Hash = (str) => {
 }
 
 // hash key
-let voterKey = "secretKey"
-let hashedKey = sha256Hash(voterKey)
+let plaintextKey = "secretKey"
+let hashedKey = sha256Hash(plaintextKey)
 
 let res = await adminApis.AddKeys(formId, {hashedKeys: [hashedKey]});
 
@@ -154,7 +153,7 @@ await adminApis.ExportSubmissions(formId, function(obj){
 
 This can be initialized in a browser using a stack like [Browserify](http://browserify.org/) 
 
-###  Initialize Voter/Public Client
+###  Initialize Public Client
 ```
 const publicSdk = require("netrosa-public-sdk")
 
@@ -162,13 +161,13 @@ const publicApi = publicSdk.initPublicClient(
     process.env.NETROSA_API_KEY, 
 )
 ```
-###  Get Anonymous Voter Auth Token
+###  Get Anonymous Submitter Auth Token
 ```
 let res = await publicApis.GetJwtToken(formId, plaintextKey)
 // res.token includes the JWT to use
 ```
 
-###  Get Anonymous Voter Auth Token QR
+###  Get Anonymous Submitter Auth Token QR
 ```
 let res = await publicApis.GetJwtTokenQR(formId, plaintextKey)
 
