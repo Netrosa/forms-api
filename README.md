@@ -20,7 +20,7 @@ npm install netrosa-admin-sdk
 **Note: Admin SDK is meant for server-deployment only.  Do not place ID or Secret in the browser** 
 
 ###  Initialize Admin Client
-```
+```javascript
 const adminSdk = require("netrosa-admin-sdk")
 
 const adminApis = adminSdk.initAdminClient(
@@ -31,7 +31,7 @@ const adminApis = adminSdk.initAdminClient(
 ```
 
 ### Create Form
-```
+```javascript
 let exampleForm = {
     "title": {
         "en": "Test Form"
@@ -93,35 +93,35 @@ let formId = form.formId;
 await adminApis.PollForStatus(formId, "ready", 60000);
 ```
 ### Get Form
-```
+```javascript
 // get form
 let res = await adminApis.GetForm(formId)
 ```
 ### Get List of Forms
-```
+```javascript
 let res = await adminApis.GetFormList()
 ```
 ### Open or Resume Form (start accepting submissions)
-```
+```javascript
 let res = await adminApis.OpenForm(formId)
 await adminApis.PollForStatus(formId, "open", 60000);
 ```
 ### Stop Form (stop accepting submissions)
-```
+```javascript
 let res = await adminApis.StopForm(formId)
 ```
 ### Close Form (Permanent)
-```
+```javascript
 let res = await adminApis.CloseForm(formId)
 await adminApis.PollForStatus(formId, "closed", 60000);
 ```
 ### Generate Submitter Keys
-```
+```javascript
 let k = await adminApis.GenerateKeys(form.formId, 3);
 // k.keys contains a list of plaintext keys
 ```
 ### Upload Submitter Keys
-```
+```javascript
 // example logic for base64(sha256(key)) 
 const sha256Hash = (str) => {
     let hash = crypto.createHash("sha256")
@@ -138,7 +138,7 @@ let res = await adminApis.AddKeys(formId, {hashedKeys: [hashedKey]});
 console.log(res.count) // 1 
 ```
 ### Export Submissions
-```
+```javascript
 await adminApis.ExportSubmissions(formId, function(obj){
     // each submission invokes this callback
     // obj {
@@ -154,7 +154,7 @@ await adminApis.ExportSubmissions(formId, function(obj){
 This can be initialized in a browser using a stack like [Browserify](http://browserify.org/) 
 
 ###  Initialize Public Client
-```
+```javascript
 const publicSdk = require("netrosa-public-sdk")
 
 const publicApis = publicSdk.initPublicClient(
@@ -162,13 +162,13 @@ const publicApis = publicSdk.initPublicClient(
 )
 ```
 ###  Get Anonymous Submitter Auth Token
-```
+```javascript
 let res = await publicApis.GetJwtToken(formId, plaintextKey)
 // res.token includes the JWT to use
 ```
 
 ###  Get Anonymous Submitter Auth Token QR
-```
+```javascript
 let res = await publicApis.GetJwtTokenQR(formId, plaintextKey)
 
 // token qr is data URL object with {formId: formId, token: jwtToken}
@@ -176,7 +176,7 @@ document.getElementById("yourimage").src = res.qr;
 ```
 
 ### Submit Entry
-```
+```javascript
 // NOTE: the payload is NOT validated yet beyond the top-level structure
 let submissionObject = {
     proof: "...",       //base64 encoded signature
