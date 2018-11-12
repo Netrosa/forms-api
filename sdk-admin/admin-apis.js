@@ -153,6 +153,7 @@ module.exports = {
     checkReady();
     return await get(`/form/${id}/submission/${subId}`)
   },
+  // primarily used for tests to wait long enough
   PollSubmissionForStatus: async(id, subId, status, timeout) => {
     checkReady();
     let now = new Date().getTime();
