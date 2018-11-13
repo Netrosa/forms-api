@@ -153,25 +153,6 @@ module.exports = {
     checkReady();
     return await get(`/form/${id}/submission/${subId}`)
   },
-  // primarily used for tests to wait long enough
-  PollSubmissionForStatus: async(id, subId, status, timeout) => {
-    checkReady();
-    let now = new Date().getTime();
-    let expired = now + timeout;
-
-    while(new Date().getTime() < expired){
-      let job = await get(`/form/${id}/submission/${subId}`)
-      if(job.txStatus === status){
-        return true;
-      }
-      if(job.txStatus === "error"){
-        throw new Error(job.errorMessage)
-      }
-      //wait 2 seconds
-      await snooze(2000);
-    }
-    throw new Error("timeout occured while polling for job");
-  },
   GetFromIPFS: async(hash) => {
     checkReady();
     return await getFromIpfs(hash)

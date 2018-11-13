@@ -1,5 +1,6 @@
 const url = require('url');
 const reqApi = require('./lib/request')
+const ethApi = require("./lib/ethereum-lib")
 
 let BASE_URL;
 let API_KEY;
@@ -41,6 +42,15 @@ const required = (name, value) => {
   }
 }
 
+const getFromIpfs = async (hash) =>{ 
+  let res = await get(`/ipfs/${hash}`)
+  try{
+    return JSON.parse(res);
+  }catch(e){
+    return res;
+  }
+}
+
 module.exports = {
   Init: async(params) => {
     required("baseUrl", params.baseUrl);
@@ -48,6 +58,19 @@ module.exports = {
     BASE_URL = url.parse(params.baseUrl);
     API_KEY = params.apiKey;
     ready=true;
+  },
+  GetForm: async(formId) => {
+    checkReady();
+    let form = await get(`/form/${formId}`)
+    let formPayload = await getFromIpfs(form.ipfsHash);
+    return {
+      form: formPayload,
+      metadata: form
+    }
+  },
+  GetFromIPFS: async(hash) => {
+    checkReady();
+    return await getFromIpfs(hash)
   },
   GetJwtToken: async(formId, token) => {
     checkReady();
@@ -69,5 +92,45 @@ module.exports = {
       "Authorization": `Bearer ${token}`
     }
     return await post(`/form/${formId}/submission`, payload, headers)
-  }
+  },
+  ConfirmSubmissionProof: async(formId, subId, proof) => {
+    let form = await get(`/form/${formId}`);
+    let sub = await get(`/form/${formId}/submission/${subId}`);
+
+    let entryHash = sub.entryHash;
+    let txId = sub.txId;
+    
+    // claimed hash has source proof in it
+    let encryptedEntry = await getFromIpfs(entryHash);
+    if(encryptedEntry.proof !== proof) {
+      throw new Error(`Proof mismatch: expected=${proof}, actual=${encryptedEntry.proof}`)
+    }
+    // transaction has claimed hash in it
+    let transaction = await ethApi.getSubmissionTx(form.network, form.version, txId);
+    if(transaction.value !== entryHash) {
+      throw new Error(`Proof on transaction does not match:  expected=${entryHash} actual=${transaction.value}`)
+    }
+  },
+  GetSubmission: async(formId, subId) => {
+    checkReady()
+    return await get(`/form/${formId}/submission/${subId}`)
+  },
+  PollSubmissionForStatus: async(id, subId, status, timeout) => {
+    checkReady();
+    let now = new Date().getTime();
+    let expired = now + timeout;
+
+    while(new Date().getTime() < expired){
+      let sub = await get(`/form/${id}/submission/${subId}`)
+      if(sub.txStatus === status){
+        return sub;
+      }
+      if(sub.txStatus === "error"){
+        throw new Error(sub.errorMessage)
+      }
+      //wait 2 seconds
+      await snooze(2000);
+    }
+    throw new Error("timeout occured while polling for sub");
+  },
 }

@@ -77,7 +77,6 @@ functions:
           method: get
           cors: true
           private: true
-          authorizer: adminAuthorizer
 
   formGetDecryptionKey:
     handler: api-admin/decryption-key.get
@@ -110,7 +109,6 @@ functions:
           method: get
           cors: true
           private: true
-          authorizer: adminAuthorizer
 
   createToken:
     handler: api-submitter/create-token.create

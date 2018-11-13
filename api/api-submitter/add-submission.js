@@ -73,6 +73,6 @@ module.exports.add = async (event, context) => {
 
     // return to submitter for status polling
     return utils.success({
-        subId: tokenId,
+        subId: tokenId
     })
 }

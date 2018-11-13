@@ -19,18 +19,24 @@ const publicApis = publicSdk.initPublicClient(
     API_VERSION
 )
 
+let timeouts = {
+    "ropsten": 600000,
+    "netvote": 60000
+}
+
 
 describe(`Form Admin APIs`, function() {
 
     let form;
     let keys;
     let subId;
+    let network = "netvote"
 
     it('should create form', async()=>{
         let res = await adminApis.CreateForm({
             form: FORM_EXAMPLES.ALL_TYPES,
             name: "test form",
-            network: "netvote",
+            network: network,
             continuousReveal: true,
             authType: "key",
             test: true
@@ -39,7 +45,7 @@ describe(`Form Admin APIs`, function() {
         //TODO: verify more than this
         assert.equal(res != null, true, "res should be set")
         console.log(form.formId);
-        await adminApis.PollForStatus(form.formId, "ready", 60000);
+        await adminApis.PollForStatus(form.formId, "ready", timeouts[network]);
     });
 
     it('should get form', async()=>{
@@ -58,7 +64,7 @@ describe(`Form Admin APIs`, function() {
         await adminApis.OpenForm(form.formId);
         let res = await adminApis.GetForm(form.formId)
         assert.equal("opening", res.formStatus, "should be opening")
-        await adminApis.PollForStatus(form.formId, "open", 60000);
+        await adminApis.PollForStatus(form.formId, "open", timeouts[network]);
     });
 
     it('should stop form', async()=>{
@@ -79,6 +85,12 @@ describe(`Form Admin APIs`, function() {
         keys = k.keys;
     });
 
+    it('should get form', async() =>{
+        let res = await publicApis.GetForm(form.formId);
+        assert.equal(res.metadata.formId, form.formId, "should return form")
+        assert.equal(JSON.stringify(res.form), JSON.stringify(FORM_EXAMPLES.ALL_TYPES), "should be same form")
+    })
+
     it('should get voter jwt token and submit', async()=>{
         let res = await publicApis.GetJwtToken(form.formId, keys[0])
         assert.equal(res.token != null, true, "token should be set")
@@ -88,7 +100,13 @@ describe(`Form Admin APIs`, function() {
             publicKey: new Buffer("test").toString("base64"),
         }, res.token)
         assert.equal(submissionResult.subId != null, true, "subId should be in result");
-        await adminApis.PollSubmissionForStatus(form.formId, submissionResult.subId, "complete", 60000);
+        subId = submissionResult.subId;
+        await publicApis.PollSubmissionForStatus(form.formId, submissionResult.subId, "complete", timeouts[network]);
+    })
+
+    it('should confirm submission proof', async ()=>{
+        //throws Error if proof not preserved 
+        await publicApis.ConfirmSubmissionProof(form.formId, subId, "abc123");
     })
 
     it('should get decryption key', async()=>{
@@ -101,7 +119,7 @@ describe(`Form Admin APIs`, function() {
         await adminApis.CloseForm(form.formId);
         let res = await adminApis.GetForm(form.formId)
         assert.equal("closing", res.formStatus, "should be closing")
-        await adminApis.PollForStatus(form.formId, "closed", 60000);
+        await adminApis.PollForStatus(form.formId, "closed", timeouts[network]);
     });
 
     it('should export submissions', async() => {
