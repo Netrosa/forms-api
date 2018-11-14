@@ -9,6 +9,8 @@ Netrosa API
 
 [Public Client SDK](#client-sdk)
 
+[Rest API](#rest-api)
+
 ## NPM Package
 
 ```
@@ -191,3 +193,37 @@ let res = await publicApis.SubmitForm(formId, submissionObject, anonymousToken);
 // returns a res.subId
 
 ```
+
+## REST API 
+
+### Authentication
+
+There are two required headers:
+
+```
+x-api-key: APIKEY
+Authorization: Basic base64(ID:SECRET)
+```
+For example, for values APKEY=abc123, ID=testid, and SECRET=testsecret, the headers are:
+```
+x-api-key: abc123
+Authorization: Basic dGVzdGlkOnRlc3RzZWNyZXQK
+```
+
+<!-- markdown-swagger -->
+ Endpoint                        | Method | Auth? | Description                                                                                                                                  
+ ------------------------------- | ------ | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------
+ `/form`                         | POST   | Yes   | Create a new form and deploy onto smart contract                                                                                             
+ `/form`                         | GET    | Yes   | Retrieves list of all forms for this tenant                                                                                                  
+ `/form/{id}/status`             | POST   | Yes   | This will transition the form to the specified state.                                                                                        
+ `/form/{id}/jwt`                | POST   | Yes   | Set public JWT Key for submitter authentication (if not using key auth)                                                                      
+ `/form/{id}/keys`               | POST   | Yes   | If count is populated, will generate and return those keys.  Otherwise, will upload base64-encoded sha256 keys found in the hashedKeys array.
+ `/form/{id}/decryptionKey`      | GET    | Yes   | Returns key in a Base64 PEM format                                                                                                           
+ `/form/{id}/submission/{subId}` | GET    | Yes   | Retrieve basic submission information. IPFS holds encrypted payload                                                                          
+ `/form/{id}`                    | GET    | Yes   | The ipfsHash reference will hold the actual form content                                                                                     
+ `/form/{id}/auth/jwt`           | POST   | Yes   | If format is QR, will additionally return JWT inside of a data-type URL for HTML display                                                     
+ `/form/{id}/auth/qr`            | POST   | Yes   | If format is QR, will additionally return JWT inside of a data-type URL for HTML display                                                     
+ `/form/{id}/submission`         | POST   | Yes   | CSubmits a submission for the form                                                                                                           
+ `/ipfs`                         | POST   | Yes   | Save an object to IPFS                                                                                                                       
+ `/ipfs/{hash}`                  | GET    | Yes   | Get an object from IPFS                                                                                                                      
+<!-- /markdown-swagger -->

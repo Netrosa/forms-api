@@ -1,0 +1,24 @@
+language: node_js
+branches:
+  only:
+  - master
+node_js:
+  - 8
+cache:
+  directories:
+    - node_modules
+matrix:
+  fast_finish: true
+before_script:
+  - npm install -g serverless
+script: 
+  - npm install --save-dev aws-sdk
+  - cd apis
+  - npm install
+  - sls deploy --stage dev
+  - cd ../sdk-admin
+  - npm install
+  - cd ../sdk-public
+  - npm install
+  - cd ..
+  - npm test
