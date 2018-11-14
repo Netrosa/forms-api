@@ -31,6 +31,7 @@ describe(`Form Admin APIs`, function() {
     let keys;
     let subId;
     let network = "netvote"
+    let payload;
 
     it('should create form', async()=>{
         let res = await adminApis.CreateForm({
@@ -94,19 +95,17 @@ describe(`Form Admin APIs`, function() {
     it('should get voter jwt token and submit', async()=>{
         let res = await publicApis.GetJwtToken(form.formId, keys[0])
         assert.equal(res.token != null, true, "token should be set")
-        let submissionResult = await publicApis.SubmitForm(form.formId, {
-            value: { signatureSeed: "seed", test: true },
-            proof: "abc123",
-            publicKey: new Buffer("test").toString("base64"),
-        }, res.token)
-        assert.equal(submissionResult.subId != null, true, "subId should be in result");
-        subId = submissionResult.subId;
-        await publicApis.PollSubmissionForStatus(form.formId, submissionResult.subId, "complete", timeouts[network]);
+        let submissionResult = await publicApis.SubmitForm(form.formId, { signatureSeed: "seed", test: true }, res.token)
+        let response = submissionResult.response;
+        payload = submissionResult.payload;
+        assert.equal(response.subId != null, true, "subId should be in result");
+        subId = response.subId;
+        await publicApis.PollSubmissionForStatus(form.formId, response.subId, "complete", timeouts[network]);
     })
 
     it('should confirm submission proof', async ()=>{
         //throws Error if proof not preserved 
-        await publicApis.ConfirmSubmissionProof(form.formId, subId, "abc123");
+        await publicApis.ConfirmSubmissionProof(form.formId, subId, payload.proof);
     })
 
     it('should get decryption key', async()=>{

@@ -1,6 +1,8 @@
 const url = require('url');
 const reqApi = require('./lib/request')
 const ethApi = require("./lib/ethereum-lib")
+const signing = require("./lib/signing")
+const uuid = require("uuid/v4");
 
 let BASE_URL;
 let API_KEY;
@@ -86,12 +88,21 @@ module.exports = {
     }
     return await post(`/form/${formId}/auth/qr`, null, headers)
   },
-  SubmitForm: async(formId, payload, token) => {
+  SubmitForm: async(formId, submission, token) => {
     checkReady()
     let headers = {
       "Authorization": `Bearer ${token}`
     }
-    return await post(`/form/${formId}/submission`, payload, headers)
+    if(!submission.signatureSeed){
+      submission.signatureSeed = uuid();
+    }
+    let payload = await signing.sign(submission);
+    payload.value = submission;
+    let resp = await post(`/form/${formId}/submission`, payload, headers)
+    return {
+      response: resp,
+      payload: payload
+    }
   },
   ConfirmSubmissionProof: async(formId, subId, proof) => {
     let form = await get(`/form/${formId}`);
