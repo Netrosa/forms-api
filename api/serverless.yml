@@ -57,6 +57,17 @@ functions:
           private: true
           authorizer: adminAuthorizer
 
+  formSetPublicJwtKey:
+    handler: api-admin/set-public-jwt.set
+    role: adminApiRole
+    events:
+      - http:
+          path: form/{id}/jwt
+          method: post
+          cors: true
+          private: true
+          authorizer: adminAuthorizer
+
   formAddSubmitterKeys:
     handler: api-admin/add-keys.addKeys
     role: adminApiRole
@@ -270,6 +281,7 @@ resources:
                   - Effect: Allow
                     Action:
                       - dynamodb:GetItem
+                      - dynamodb:PutItem
                     Resource: "arn:aws:dynamodb:us-east-1:891335278704:table/formKeys"
                   - Effect: Allow
                     Action:

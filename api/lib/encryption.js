@@ -124,6 +124,27 @@ const getDecryptionKey = async(formId) => {
     return await getKey(formId, KEY_TYPE.ENCRYPTION_PRIVATE)
 }
 
+const addUnencryptedKey = async (formId, keyType, key) => {
+    let obj = {
+        formId: formId,
+        keyType: keyType,
+        value: key,
+        encrypted: false,
+        txTimestamp: new Date().getTime()
+    }
+
+    let params = {
+        TableName: KEY_TABLE,
+        Item: obj
+    }
+    await docClient.put(params).promise();
+    return obj.formId;
+}
+
+const setJwtPublicKey = async (formId, keyBase64) => {
+    return await addUnencryptedKey(formId, KEY_TYPE.JWT_PUBLIC, keyBase64);
+}
+
 module.exports =  {
     KEY_TYPE: KEY_TYPE,
     anonymize: anonymize,
@@ -134,5 +155,6 @@ module.exports =  {
     createJwt: createJwt,
     getJwtPublicKey: getJwtPublicKey,
     encrypt: encrypt,
-    getDecryptionKey: getDecryptionKey
+    getDecryptionKey: getDecryptionKey,
+    setJwtPublicKey: setJwtPublicKey
 }

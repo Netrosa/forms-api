@@ -1,0 +1,621 @@
+openapi: "3.0.0"
+info:
+  description: "Netrosa API"
+  version: "0.0.2"
+  title: "Netrosa API"
+  contact:
+    email: "steven@citizendata.network"
+  license:
+    name: "GPL 3.0"
+    url: "https://www.gnu.org/licenses/gpl-3.0.en.html"
+servers:
+  - url: https://api.netrosa.io/v1/
+    description: API Endpoint for Netrosa
+paths:
+  /form:
+    post:
+      summary: "Create a new Form"
+      description: "Create a new form and deploy onto smart contract"
+      operationId: "createForm"
+      security:
+      - basicAuth: []
+        apiKeyAuth: []
+      tags:
+        - Form Administration
+      requestBody:
+        description: Form properties
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FormProperties"
+      responses:
+        400:
+          description: "Invalid input"
+        200:
+          description: Form ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Form'
+    get:
+      summary: "Retrieves list of all forms for this tenant"
+      description: "Retrieves list of all forms for this tenant"
+      operationId: "getFormList"
+      security:
+      - basicAuth: []
+        apiKeyAuth: []
+      tags:
+        - Form Administration
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The job ID
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Form not found"
+        200:
+          description: Form Data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Form' 
+
+  /form/{id}/status:
+    post:
+      summary: "Set status of existing Form"
+      description: "This will transition the form to the specified state."
+      operationId: "setFormStatus"
+      security:
+      - basicAuth: []
+        apiKeyAuth: []
+      tags:
+        - Form Administration
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The form ID
+      requestBody:
+        description: "Form status"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FormStatus"
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Form not found"
+        200:
+          description: Form Status Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormStatusResponse'
+
+  /form/{id}/jwt:
+    post:
+      summary: "Set public JWT Key for submitter authentication"
+      description: "Set public JWT Key for submitter authentication (if not using key auth)"
+      operationId: "setPublicJwt"
+      security:
+      - basicAuth: []
+        apiKeyAuth: []
+      tags:
+        - Form Administration
+      requestBody:
+        description: "Public PEM file"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The form ID
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Form not found"
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /form/{id}/keys:
+    post:
+      summary: "Add or generate Submitter Keys for form"
+      description: "If count is populated, will generate and return those keys.  Otherwise, will upload base64-encoded sha256 keys found in the hashedKeys array."
+      operationId: "setSubmitterKeys"
+      security:
+      - basicAuth: []
+        apiKeyAuth: []
+      tags:
+        - Form Administration
+      requestBody:
+        description: "Form key set object"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeyGeneration"
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The form ID
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Form not found"
+        200:
+          description: Key Result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyResult'
+
+  /form/{id}/decryptionKey:
+    get:
+      summary: "Retrieves the form metadata information"
+      description: "Anyone may retrieve basic form information"
+      operationId: "getFormDecryptionKey"
+      security:
+      - basicAuth: []
+        apiKeyAuth: []
+      tags:
+        - Form Administration
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The job ID
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Form not found"
+        200:
+          description: Form Data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecryptionKey' 
+
+  /form/{id}/submission/{subId}:
+    get:
+      summary: "Retrieves the form metadata information"
+      description: "Anyone may retrieve basic form information"
+      operationId: "getForm"
+      security:
+      - apiKeyAuth: []
+      tags:
+        - Form Public Data
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The form ID
+       - in: path
+         name: subId   
+         required: true
+         schema:
+           type: string
+           description: The submission ID
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Form or Submission not found"
+        200:
+          description: Submission Data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission' 
+
+  /form/{id}:
+    get:
+      summary: "Retrieves the form metadata information"
+      description: "Anyone may retrieve basic form information"
+      operationId: "getForm"
+      security:
+      - apiKeyAuth: []
+      tags:
+        - Form Public Data
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The job ID
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Form not found"
+        200:
+          description: Form Data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Form'
+
+  /form/{id}/auth/jwt:
+    post:
+      summary: "Exchanges submitter Key for one-time use anonymized JWT token if authType is 'key' "
+      description: "If format is QR, will additionally return JWT inside of a data-type URL for HTML display"
+      operationId: "getSubmitterAuthJwt"
+      security:
+      - bearerAuth: []
+        apiKeyAuth: []
+      tags:
+        - Submitter Authentication
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The job ID
+       - in: path
+         name: format   
+         required: true
+         schema:
+           type: string
+           enum:
+            - jwt
+            - qr
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Job not found"
+        200:
+          description: Async Tally Job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenJWT'
+
+  /form/{id}/auth/qr:
+    post:
+      summary: "Exchanges submitter Key for one-time use anonymized JWT token in a QR if authType is 'key' "
+      description: "If format is QR, will additionally return JWT inside of a data-type URL for HTML display"
+      operationId: "getSubmitterAuthQr"
+      security:
+      - bearerAuth: []
+        apiKeyAuth: []
+      tags:
+        - Submitter Authentication
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The job ID
+       - in: path
+         name: format   
+         required: true
+         schema:
+           type: string
+           enum:
+            - jwt
+            - qr
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Job not found"
+        200:
+          description: Async Tally Job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenQR'
+
+  /form/{id}/submission:
+    post:
+      summary: "Submits a submission for the form"
+      description: "CSubmits a submission for the form"
+      operationId: "submitSubmission"
+      security:
+      - bearerAuth: []
+        apiKeyAuth: []
+      tags:
+        - Submit Entry
+      requestBody:
+        description: "Submission"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Submission"
+      parameters:
+       - in: path
+         name: id   
+         required: true
+         schema:
+           type: string
+           description: The job ID
+      responses:
+        400:
+          description: "Invalid input"
+        404:
+          description: "Job not found"
+        200:
+          description: Submission ID for Lookup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionId'
+
+  /ipfs:
+    post:
+      summary: "Save an object to IPFS"
+      description: "Save an object to IPFS"
+      operationId: "ipfsSave"
+      security:
+      - apiKeyAuth: []
+      tags:
+        - IPFS
+      requestBody:
+        description: "Payload"
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        400:
+          description: "Invalid input"
+        200:
+          description: Hash Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpfsResponse'
+  /ipfs/{hash}:
+    get:
+      summary: "Get an object from IPFS"
+      description: "Get an object from IPFS"
+      operationId: "ipfsGet"
+      security:
+      - apiKeyAuth: []
+      tags:
+        - IPFS
+      parameters:
+       - in: path
+         name: hash   
+         required: true
+         schema:
+           type: string
+           description: IPFS Hash to retrieve
+      responses:
+        400:
+          description: "Invalid input"
+        200:
+          description: Hash Created
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    basicAuth:
+      type: http
+      scheme: basic
+    apiKeyAuth:
+      description: "API Key"  
+      type: apiKey
+      in: header
+      name: x-api-key
+  schemas:
+    FormProperties:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          description: "Name of form"
+        continuousReveal:
+          type: "boolean"
+          default: false
+          description: "If true, decryption key will be revealed to all throughout (completely public)"
+        network:
+          type: "string"
+          description: "Network for Deployment"
+          enum:
+          - "netvote"
+          - "ropsten"
+          - "mainnet"
+        authType:
+          type: "string"
+          description: "Type of authentication for submitters (default is key)"
+          enum:
+          - "key"
+          - "jwt"
+        test:
+          type: "boolean"
+          default: false
+          description: "If true, this form is free, and may be deleted by the system after some time."
+    Form:
+      type: "object"
+      properties:
+        formId:
+          type: string
+        network:
+          type: string
+          enum:
+          - netvote
+          - ropsten
+          - mainnet
+        version:
+          type: "integer"
+          format: int32
+        formStatus:
+          type: "string"
+          description: "Form Status, drives whether submisisons are accepted"
+          enum:
+          - "building"
+          - "ready"
+          - "opening"
+          - "open"
+          - "stopped"
+          - "closing"
+          - "closed"
+        company:
+          type: string
+        txId:
+          type: string
+        owner:
+          type: string
+        formIdHash:
+          type: string
+        ipfsHash:
+          type: string
+        address:
+          type: string
+        txTimestamp:
+          type: integer
+          format: int64
+    FormStatus:
+      type: "object"
+      properties:
+        status:
+          type: "string"
+          description: "Form Status"
+          enum:
+          - "open"
+          - "stopped"
+          - "closed"
+    FormStatusResponse:
+      type: "object"
+      properties:
+        formStatus:
+          type: "string"
+          description: "Form Status, drives whether submisisons are accepted"
+          enum:
+          - "building"
+          - "ready"
+          - "opening"
+          - "open"
+          - "stopped"
+          - "closing"
+          - "closed"
+    KeyGeneration:
+      type: "object"
+      properties:
+        count:
+          type: "integer"
+          format: int32
+    HashedKeys:
+      type: "object"
+      properties:
+        hashedKeys:
+          type: "array"
+          items:
+            type: string
+    SubmissionId:
+      type: "object"
+      properties:
+        subId:
+          type: string
+    DecryptionKey:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Base64 encoded Private RSA PEM file
+    AuthTokenJWT:
+      type: object
+      properties:
+        formId:
+          type: string
+        token:
+          type: string
+    AuthTokenQR:
+      type: object
+      properties:
+        formId:
+          type: string
+        token:
+          type: string
+        qr:
+          type: string
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+    KeyResult:
+      type: "object"
+      properties:
+        count:
+          type: "integer"
+          format: int32
+        keys:
+          type: "array"
+          items:
+            type: "string"
+    IpfsResponse:
+      type: object
+      properties:
+        hash:
+          type: string
+    Submission:
+      type: "object"
+      properties:
+        formId:
+          type: string
+        subId:
+          type: string
+        txStatus:
+          type: "string"
+          description: "Status of the blockchain transaction"
+          enum:
+          - "complete"
+          - "pending"
+          - "error"
+        company:
+          type: string
+        txId:
+          type: string
+        senderId:
+          type: string
+        createdAt:
+          type: integer
+          format: int64
+        errorMsg:
+          type: string
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
