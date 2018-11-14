@@ -176,8 +176,8 @@ paths:
 
   /form/{id}/decryptionKey:
     get:
-      summary: "Retrieves the form metadata information"
-      description: "Anyone may retrieve basic form information"
+      summary: "Retrieves the decryption key for the form entries"
+      description: "Returns key in a Base64 PEM format"
       operationId: "getFormDecryptionKey"
       security:
       - basicAuth: []
@@ -205,8 +205,8 @@ paths:
 
   /form/{id}/submission/{subId}:
     get:
-      summary: "Retrieves the form metadata information"
-      description: "Anyone may retrieve basic form information"
+      summary: "Retrieves the submission metadata information"
+      description: "Retrieve basic submission information. IPFS holds encrypted payload"
       operationId: "getForm"
       security:
       - apiKeyAuth: []
@@ -240,7 +240,7 @@ paths:
   /form/{id}:
     get:
       summary: "Retrieves the form metadata information"
-      description: "Anyone may retrieve basic form information"
+      description: "The ipfsHash reference will hold the actual form content"
       operationId: "getForm"
       security:
       - apiKeyAuth: []
