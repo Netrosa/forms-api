@@ -42,7 +42,7 @@ const resumeForm = async (user, form) => {
 
 const legalTransitions = {
     "ready": {
-        "open": openForm
+        "open": resumeForm
     },
     "open": {
         "stopped": stopForm
