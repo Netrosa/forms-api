@@ -64,7 +64,7 @@ describe(`Form Admin APIs`, function() {
     it('should open form', async()=>{
         await adminApis.OpenForm(form.formId);
         let res = await adminApis.GetForm(form.formId)
-        assert.equal("opening", res.formStatus, "should be opening")
+        assert.equal("open", res.formStatus, "should be open")
         await adminApis.PollForStatus(form.formId, "open", timeouts[network]);
     });
 

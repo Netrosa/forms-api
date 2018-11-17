@@ -6,12 +6,18 @@ const submissions = require('../lib/submit-storage');
 const encryption = require('../lib/encryption')
 const Joi = require("joi")
 
-const submissionSchema = Joi.object().keys({
+const netRosaSchema = Joi.object().keys({
     value: Joi.object().keys({
         signatureSeed: Joi.string().required()
     }).unknown(true).required(),
     proof: Joi.string().required(),
     publicKey: Joi.string().base64().required()
+})
+
+const openRosaSchema = Joi.object().keys({
+    value: Joi.string(),
+    proof: Joi.string(),
+    publicKey: Joi.string().base64()
 })
 
 module.exports.add = async (event, context) => {
@@ -34,12 +40,14 @@ module.exports.add = async (event, context) => {
         return utils.error(409, {message: `form status is ${form.formStatus}`})
     }
 
-    let params = await utils.validate(event.body, submissionSchema);
+    let schema = (form.formType === "openrosa") ? openRosaSchema : netRosaSchema;
+    let params = await utils.validate(event.body, schema);
 
-    //TODO: check signature
+    //TODO: check signature if present
 
-    // encrypt
-    let encryptedEntry = await encryption.encrypt(formId, JSON.stringify(params.value));
+    // encrypt with compression to allow for RSA asymetric encryption (control for size)
+    let value = (typeof params.value === "object") ? JSON.stringify(params.value) : params.value;
+    let encryptedEntry = await encryption.encrypt(formId, value);
 
     let submissionPayload = {
         proof: params.proof,

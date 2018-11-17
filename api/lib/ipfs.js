@@ -38,7 +38,10 @@ const saveToIPFSUnsafe = (ipfs, data) => {
                 reject(new Error("IPFS save timeout"));
             }
         }, 10000);
-        ipfs.add(JSON.stringify(data), (err, result) => {
+        if(typeof data === "object"){
+            data = JSON.stringify(data);
+        }
+        ipfs.add(data, (err, result) => {
             completed = true;
             if (err) {
                 reject(err)

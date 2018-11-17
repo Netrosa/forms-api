@@ -5,7 +5,10 @@ const validations = require("../lib/validations")
 
 const FORM_SCHEMA = Joi.object().keys({
     name: Joi.string().required(),
-    form: validations.FORM_SCHEMA,
+    formType: Joi.string().only("openrosa", "netrosa").default("netrosa"),
+    form: Joi.alternatives()
+        .when('formType', { is: 'openrosa', then: Joi.string() })
+        .when('formType', { is: 'netrosa', then: validations.FORM_SCHEMA }),
     continuousReveal: Joi.boolean().default(false),
     network: Joi.string().only("netvote", "ropsten").required(),
     authType: Joi.string().only("key", "jwt").default("key"),
@@ -31,7 +34,8 @@ module.exports.createForm = async (event, context) => {
             company: user.company,
             continuousReveal: params.continuousReveal,
             network: params.network,
-            authType: params.authType
+            authType: params.authType,
+            formType: params.formType
         }
 
         await utils.asyncLambda("netrosa-ethereum-prod-create-form", payload);

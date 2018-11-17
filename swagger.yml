@@ -446,6 +446,12 @@ components:
         name:
           type: "string"
           description: "Name of form"
+        formType:
+          type: "string"
+          description: "Type of form (default=netrosa)"
+          enum:
+          - "netrosa"
+          - "openrosa"
         continuousReveal:
           type: "boolean"
           default: false

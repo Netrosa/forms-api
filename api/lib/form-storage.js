@@ -63,6 +63,7 @@ const putForm = async (user, form) => {
         "createdAt": new Date().getTime(),
         "network": form.network,
         "createdBy": user.email,
+        "formType": form.formType,
         "authType": form.authType,
         "formStatus": "building",
         "txStatus": "pending",

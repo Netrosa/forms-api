@@ -61,6 +61,13 @@ const getDecryptionKey = async (id) => {
   return decryptionKeys[id]
 }
 
+function decrypt(encryptedText, password) {
+  let decipher = crypto.createDecipher("aes-256-cbc", new Buffer(password));
+  let dec = decipher.update(encryptedText, "base64", "utf8");
+  dec += decipher.final("utf8");
+  return dec;
+}
+
 const exportSubmissions = async (id, callback) => {
   let cb = callback || function(obj) { console.log(obj) }
   let form = await get(`/form/${id}`)
@@ -75,9 +82,14 @@ const exportSubmissions = async (id, callback) => {
   for(let i=0; i<count; i++){
     let entryHash = await SubmissionLog.getEntryAt(hashedFormId, i);
     let entry = await getFromIpfs(entryHash);
-    let decrypted = crypto.privateDecrypt(new Buffer(decryptionKey, "base64"), new Buffer(entry.value, "base64"))
+    let decrypted = decrypt(entry.value, decryptionKey)
 
-    let obj = JSON.parse(decrypted.toString("utf8"))
+    let obj = decrypted;
+    try{
+      obj = JSON.parse(decrypted)
+    }catch(e){
+      //ignore
+    }
     //TODO: validate proof here
     cb({
       index: i,

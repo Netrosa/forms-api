@@ -108,11 +108,19 @@ const createJwt = async (formId, token) => {
     return jwt.compact();
 }
 
-const encrypt = async (formId, text) => {
+const rsaEncrypt = async (formId, text) => {
     let encryptionKey = await getKey(formId, KEY_TYPE.ENCRYPTION_PUBLIC);
     let keyBuffer = new Buffer(encryptionKey, "base64");
     let encrypted = crypto.publicEncrypt(keyBuffer, new Buffer(text, "utf8"))
     return encrypted.toString("base64")
+}
+
+const encrypt = async (formId, text) => {
+    let encryptionKey = await getKey(formId, KEY_TYPE.ENCRYPTION_PRIVATE);
+    let cipher = crypto.createCipher("aes-256-cbc", encryptionKey);           
+    let encrypted = cipher.update(text, "utf8", "base64");
+    encrypted += cipher.final("base64");
+    return encrypted;
 }
 
 const checkSignature = async (text, publicKey, signature) => {
