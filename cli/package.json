@@ -1,0 +1,26 @@
+{
+  "name": "netrosa-cli",
+  "version": "0.0.1",
+  "description": "Netrosa CLI for retrieving form data.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/netrosa/netrosa-api.git"
+  },
+  "author": "steven@citizendata.network",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/netrosa/netrosa-api/issues"
+  },
+  "homepage": "https://github.com/netrosa/netrosa-api#readme",
+  "dependencies": {
+    "commander": "^2.19.0",
+    "netrosa-admin-sdk": "0.0.3"
+  },
+  "bin": {
+    "netrosa": "./cli.js"
+  }
+}

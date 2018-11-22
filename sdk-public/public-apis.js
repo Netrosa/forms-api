@@ -117,6 +117,7 @@ module.exports = {
       throw new Error(`Proof mismatch: expected=${proof}, actual=${encryptedEntry.proof}`)
     }
     // transaction has claimed hash in it
+    console.log(`${form.network}, ${form.version}, ${txId}`)
     let transaction = await ethApi.getSubmissionTx(form.network, form.version, txId);
     if(transaction.value !== entryHash) {
       throw new Error(`Proof on transaction does not match:  expected=${entryHash} actual=${transaction.value}`)
