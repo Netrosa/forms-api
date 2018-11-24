@@ -3,6 +3,7 @@ const url = require('url');
 const reqApi = require('./lib/request')
 const networks = require('./lib/eth-networks')
 const crypto = require("crypto")
+const ursa = require("ursa");
 
 AWS.config.update({ region: 'us-east-1' });
 
@@ -68,6 +69,18 @@ function decrypt(encryptedText, password) {
   return dec;
 }
 
+const validateProof = (jsonStr, publicKey, proof) => {
+  try{
+    const pub = ursa.createPublicKey(publicKey, "base64");    
+    if(pub.hashAndVerify('md5', Buffer.from(jsonStr), proof, "base64")){
+      return true;
+    }
+  }catch(e){
+    // proof validation failed, squashing
+  }
+  return false;
+}
+
 const exportSubmissions = async (id, callback) => {
   let cb = callback || function(obj) { console.log(obj) }
   let form = await get(`/form/${id}`)
@@ -88,13 +101,17 @@ const exportSubmissions = async (id, callback) => {
     try{
       obj = JSON.parse(decrypted)
     }catch(e){
-      //ignore
+      //ignore, not everything is JSON
     }
+
+    let validProof = validateProof(decrypted, entry.publicKey, entry.proof);
+    
     //TODO: validate proof here
     cb({
       index: i,
       total: count,
       decrypted: obj,
+      validProof: validProof,
       publicKey: entry.publicKey,
       proof: entry.proof
     })

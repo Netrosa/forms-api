@@ -60,9 +60,12 @@ const exportSubmissions = async (formId, format) => {
         await client.ExportSubmissions(formId, function (response) {
             console.log(`extracting ${response.index+1} of ${response.total} to ${filename}`)
             entries.push({
-                proof: response.proof,
-                publicKey: response.publicKey,
-                value: response.decrypted
+                integrity: {
+                    proof: response.proof,
+                    publicKey: response.publicKey,
+                    validProof: response.validProof
+                },
+                payload: response.decrypted
             });
         })
         logger.write(JSON.stringify({
