@@ -59,7 +59,11 @@ const exportSubmissions = async (formId, format) => {
         let entries = [];
         await client.ExportSubmissions(formId, function (response) {
             console.log(`extracting ${response.index+1} of ${response.total} to ${filename}`)
-            entries.push(response.decrypted);
+            entries.push({
+                proof: response.proof,
+                publicKey: response.publicKey,
+                value: response.decrypted
+            });
         })
         logger.write(JSON.stringify({
             formId: formId,

@@ -18,7 +18,7 @@
   "homepage": "https://github.com/netrosa/netrosa-api#readme",
   "dependencies": {
     "commander": "^2.19.0",
-    "netrosa-admin-sdk": "0.0.3"
+    "netrosa-admin-sdk": "0.0.4"
   },
   "bin": {
     "netrosa": "./cli.js"

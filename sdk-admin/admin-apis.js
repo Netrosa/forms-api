@@ -94,7 +94,9 @@ const exportSubmissions = async (id, callback) => {
     cb({
       index: i,
       total: count,
-      decrypted: obj
+      decrypted: obj,
+      publicKey: entry.publicKey,
+      proof: entry.proof
     })
   }
   return true;
