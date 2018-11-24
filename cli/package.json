@@ -1,6 +1,6 @@
 {
   "name": "netrosa-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Netrosa CLI for retrieving form data.",
   "main": "index.js",
   "scripts": {

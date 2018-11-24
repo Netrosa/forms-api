@@ -42,7 +42,7 @@ const listForms = async () => {
     }, null, 4));
 }
 
-const exportSubmissions = async (formId, format) => {
+const exportSubmissions = async (formId, filename) => {
     initClient();
     let form = await client.GetForm(formId)
     if (!form) {
@@ -50,7 +50,7 @@ const exportSubmissions = async (formId, format) => {
         process.exit(1);
     }
 
-    let filename = `${formId}.${format}`
+    filename = filename || `${formId}.json`
     var logger = fs.createWriteStream(filename, {
         flags: 'ax'
     })
@@ -87,18 +87,10 @@ program
     })
 
 program
-    .version('0.0.1')
     .command('export <formId>')
-    .option('--format [format]', 'json', /^(json)$/i, 'json')
-    .action(async function (formId, cmd, format) {
-        await exportSubmissions(formId, cmd.format);
-    })
-
-program
-    .version('0.0.1')
-    .command('*')
-    .action(async function (cmd) {
-        console.log("currently only 'list' and 'export <formId>' are valid commands")
+    .option('-f, --file [value]', 'filename to export to (default: ./<formId>.json)')
+    .action(async function (formId, cmd) {
+        await exportSubmissions(formId, cmd.file);
     })
 
 program.parse(process.argv)
