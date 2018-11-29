@@ -1,6 +1,6 @@
 {
   "name": "netrosa-cli",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Netrosa CLI for retrieving form data.",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "homepage": "https://github.com/netrosa/netrosa-api#readme",
   "dependencies": {
     "commander": "^2.19.0",
-    "netrosa-admin-sdk": "0.0.5"
+    "netrosa-admin-sdk": "0.0.6"
   },
   "bin": {
     "netrosa": "./cli.js"
