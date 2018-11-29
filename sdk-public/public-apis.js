@@ -5,6 +5,7 @@ const signing = require("./lib/signing")
 const uuid = require("uuid/v4");
 
 let BASE_URL;
+let IPFS_URL;
 let API_KEY;
 let ready=false;
 
@@ -17,6 +18,12 @@ const authentify = (headers) => {
   reqHeaders['x-api-key'] = API_KEY;
   return reqHeaders;
 }
+
+const ipfsGet = async (path, headers) => {
+  let reqHeaders = await authentify(headers);
+  let apiPath = IPFS_URL.pathname == "/" ? path : `${IPFS_URL.pathname}${path}`
+  return reqApi.get(IPFS_URL.hostname, apiPath, reqHeaders);
+};
 
 const get = async (path, headers) => {
   let reqHeaders = await authentify(headers);
@@ -45,7 +52,7 @@ const required = (name, value) => {
 }
 
 const getFromIpfs = async (hash) =>{ 
-  let res = await get(`/ipfs/${hash}`)
+  let res = await ipfsGet(`/ipfs/${hash}`)
   try{
     return JSON.parse(res);
   }catch(e){
@@ -58,6 +65,7 @@ module.exports = {
     required("baseUrl", params.baseUrl);
     required("apiKey", params.apiKey);
     BASE_URL = url.parse(params.baseUrl);
+    IPFS_URL = url.parse(params.ipfsUrl);
     API_KEY = params.apiKey;
     ready=true;
   },
@@ -117,7 +125,6 @@ module.exports = {
       throw new Error(`Proof mismatch: expected=${proof}, actual=${encryptedEntry.proof}`)
     }
     // transaction has claimed hash in it
-    console.log(`${form.network}, ${form.version}, ${txId}`)
     let transaction = await ethApi.getSubmissionTx(form.network, form.version, txId);
     if(transaction.value !== entryHash) {
       throw new Error(`Proof on transaction does not match:  expected=${entryHash} actual=${transaction.value}`)

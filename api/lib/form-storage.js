@@ -53,7 +53,15 @@ const setStatus = async (user, id, status) => {
 
 const putForm = async (user, form) => {
     let id = uuid();
-    let hash = await ipfs.save(form.form);
+
+    let payload = form.form;
+    if(typeof payload === "object") {
+        payload = Buffer.from(JSON.stringify(payload)).toString("base64")
+    } else {
+        payload = Buffer.from(payload).toString("base64")
+    }
+
+    let hash = await ipfs.save(payload);
     let mode = form.test ? "TEST" : "PROD";
     let item = {
         "company": user.company,

@@ -5,7 +5,8 @@ const initAdminClient = (apiKey, id, secret, version) => {
         apiKey: apiKey,
         id: id,
         secret: secret,
-        baseUrl: `https://api.netrosa.io/${v}`
+        baseUrl: `https://api.netrosa.io/${v}`,
+        ipfsUrl: `https://ipfs.citizendata.network/${v}`
     })
     return adminApi;
 }

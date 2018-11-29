@@ -1,0 +1,70 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: ipfs-gateway-api # NOTE: update this with your service name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+plugins:
+  - serverless-apigw-binary
+  - serverless-apigwy-binary
+
+custom:
+  apigwBinary:
+    types:
+      - '*/*'
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+      - "s3:PutObject"
+    Resource:
+      Fn::Join:
+        - ""
+        - - "arn:aws:s3:::"
+          - "Ref" : "ServerlessDeploymentBucket"
+  - Effect: Allow
+    Action:
+      - "s3:PutObject"
+      - "s3:GetObject"
+    Resource: "arn:aws:s3:::netvote-ipfs/*"   
+
+functions:
+
+  ipfsSave:
+    handler: ipfs/ipfs-api.save
+    timeout: 30
+    events:
+      - http:
+          path: ipfs
+          method: post
+          private: true
+          cors: true
+          contentHandling: CONVERT_TO_BINARY
+
+  ipfsGet:
+    handler: ipfs/ipfs-api.get
+    timeout: 30
+    events:
+      - http:
+          path: ipfs/{hash}
+          method: get
+          private: true
+          cors: true
+          contentHandling: CONVERT_TO_BINARY

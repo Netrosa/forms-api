@@ -11,6 +11,7 @@ let ID;
 let SECRET;
 let BASE_URL;
 let API_KEY;
+let IPFS_URL;
 let ready=false;
 
 const snooze = ms => new Promise(resolve => setTimeout(resolve, ms)); 
@@ -39,6 +40,19 @@ const post = async (path, postObj, headers) => {
   let apiPath = BASE_URL.pathname == "/" ? path : `${BASE_URL.pathname}${path}`
   return reqApi.post(BASE_URL.hostname, apiPath, postObj, reqHeaders);
 };
+
+const ipfsGet = async (path, headers) => {
+  let reqHeaders = await authentify(headers);
+  let apiPath = IPFS_URL.pathname == "/" ? path : `${IPFS_URL.pathname}${path}`
+  return reqApi.get(IPFS_URL.hostname, apiPath, reqHeaders);
+};
+
+const ipfsPost = async (path, postObj, headers) => {
+  let reqHeaders = await authentify(headers);
+  let apiPath = IPFS_URL.pathname == "/" ? path : `${IPFS_URL.pathname}${path}`
+  return reqApi.post(IPFS_URL.hostname, apiPath, postObj, reqHeaders);
+};
+
 
 const checkReady = () =>{
   if(!ready){
@@ -120,7 +134,7 @@ const exportSubmissions = async (id, callback) => {
 }
 
 const getFromIpfs = async (hash) =>{ 
-  let res = await get(`/ipfs/${hash}`)
+  let res = await ipfsGet(`/ipfs/${hash}`)
   try{
     return JSON.parse(res);
   }catch(e){
@@ -140,6 +154,7 @@ module.exports = {
     SECRET = params.secret;
     API_KEY = params.apiKey;
     BASE_URL = url.parse(params.baseUrl);
+    IPFS_URL = url.parse(params.ipfsUrl);
     ready=true;
   },
 	CreateForm: async(payload) => {
@@ -190,7 +205,7 @@ module.exports = {
   },
   SaveToIPFS: async(obj) => {
     checkReady();
-    return await post(`/ipfs`, obj)
+    return await ipfsPost(`/ipfs`, obj)
   },
   GetDecryptionKey: async(id) => {
     checkReady();

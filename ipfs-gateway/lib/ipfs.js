@@ -42,7 +42,6 @@ const saveToIPFSUnsafe = async (ipfs, data) => {
         if(typeof data === "object"){
             data = JSON.stringify(data);
         }   
-        
         let res = await ipfs.add({
             content: Buffer.from(data, "base64"),
             path: "data"

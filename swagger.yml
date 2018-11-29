@@ -375,57 +375,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/SubmissionId'
 
-  /ipfs:
-    post:
-      summary: "Save an object to IPFS"
-      description: "Save an object to IPFS"
-      operationId: "ipfsSave"
-      security:
-      - apiKeyAuth: []
-      tags:
-        - IPFS
-      requestBody:
-        description: "Payload"
-        required: true
-        content:
-          text/plain:
-            schema:
-              type: string
-      responses:
-        400:
-          description: "Invalid input"
-        200:
-          description: Hash Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IpfsResponse'
-  /ipfs/{hash}:
-    get:
-      summary: "Get an object from IPFS"
-      description: "Get an object from IPFS"
-      operationId: "ipfsGet"
-      security:
-      - apiKeyAuth: []
-      tags:
-        - IPFS
-      parameters:
-       - in: path
-         name: hash   
-         required: true
-         schema:
-           type: string
-           description: IPFS Hash to retrieve
-      responses:
-        400:
-          description: "Invalid input"
-        200:
-          description: Hash Created
-          content:
-            text/plain:
-              schema:
-                type: string
-
 components:
   securitySchemes:
     bearerAuth:
@@ -592,11 +541,6 @@ components:
           type: "array"
           items:
             type: "string"
-    IpfsResponse:
-      type: object
-      properties:
-        hash:
-          type: string
     Submission:
       type: "object"
       properties:

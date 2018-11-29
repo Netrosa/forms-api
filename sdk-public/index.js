@@ -3,7 +3,8 @@ const initPublicClient = (apiKey, version) => {
     const publicApi = require("./public-apis");
     publicApi.Init({
         apiKey: apiKey,
-        baseUrl: `https://api.netrosa.io/${v}`
+        baseUrl: `https://api.netrosa.io/${v}`,
+        ipfsUrl: `https://ipfs.citizendata.network/${v}`
     })
     return publicApi;
 }

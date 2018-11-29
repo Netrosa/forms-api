@@ -25,6 +25,18 @@ let timeouts = {
 }
 
 
+describe(`IPFS API`, function () {
+
+    it('should save and get file', async () => {
+        let res = await adminApis.SaveToIPFS({
+            test: true
+        })
+        let obj = await adminApis.GetFromIPFS(res.hash);
+        assert.equal(obj.test, true, "should be same object")
+    });
+
+})
+
 describe(`Form Admin APIs`, function() {
 
     let form;
@@ -49,9 +61,14 @@ describe(`Form Admin APIs`, function() {
         await adminApis.PollForStatus(form.formId, "ready", timeouts[network]);
     });
 
+    it('should get form', async() =>{
+        let res = await publicApis.GetForm(form.formId);
+        assert.equal(res.metadata.formId, form.formId, "should return form")
+        assert.equal(JSON.stringify(res.form), JSON.stringify(FORM_EXAMPLES.ALL_TYPES), "should be same form")
+    })
+
     it('should get form', async()=>{
         let res = await adminApis.GetForm(form.formId)
-        //TODO: verify more than this
         assert.equal(res != null, true, "res should be set")
     });
 
@@ -85,12 +102,6 @@ describe(`Form Admin APIs`, function() {
         assert.equal(k.keys.length, 3, "should have 3 keys")
         keys = k.keys;
     });
-
-    it('should get form', async() =>{
-        let res = await publicApis.GetForm(form.formId);
-        assert.equal(res.metadata.formId, form.formId, "should return form")
-        assert.equal(JSON.stringify(res.form), JSON.stringify(FORM_EXAMPLES.ALL_TYPES), "should be same form")
-    })
 
     it('should get voter jwt token and submit', async()=>{
         let res = await publicApis.GetJwtToken(form.formId, keys[0])
