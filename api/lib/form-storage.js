@@ -2,6 +2,7 @@ const AWS = require("aws-sdk");
 const uuid = require("uuid/v4");
 const ipfs = require("./ipfs");
 const docClient = new AWS.DynamoDB.DocumentClient();
+const utils = require("./utils")
 
 const FORM_TABLE = "forms"
 const FORM_KEY_TABLE = "formSubmitterKeys";
@@ -77,6 +78,9 @@ const putForm = async (user, form) => {
         "txStatus": "pending",
         "mode": mode
     };
+
+    utils.addTtl(mode, item);
+
     let params = {
         TableName: FORM_TABLE,
         Item: item

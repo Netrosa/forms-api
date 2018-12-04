@@ -132,13 +132,17 @@ const getDecryptionKey = async(formId) => {
     return await getKey(formId, KEY_TYPE.ENCRYPTION_PRIVATE)
 }
 
-const addUnencryptedKey = async (formId, keyType, key) => {
+const addUnencryptedKey = async (formId, keyType, key, ttl) => {
     let obj = {
         formId: formId,
         keyType: keyType,
         value: key,
         encrypted: false,
         txTimestamp: new Date().getTime()
+    }
+
+    if(ttl){
+        obj.ttlTimestamp = ttl;
     }
 
     let params = {
@@ -149,8 +153,8 @@ const addUnencryptedKey = async (formId, keyType, key) => {
     return obj.formId;
 }
 
-const setJwtPublicKey = async (formId, keyBase64) => {
-    return await addUnencryptedKey(formId, KEY_TYPE.JWT_PUBLIC, keyBase64);
+const setJwtPublicKey = async (formId, keyBase64, ttl) => {
+    return await addUnencryptedKey(formId, KEY_TYPE.JWT_PUBLIC, keyBase64, ttl);
 }
 
 module.exports =  {

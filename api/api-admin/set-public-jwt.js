@@ -26,7 +26,7 @@ module.exports.set = async (event, context) => {
       return utils.error(409, `form is using ${form.authType} auth, public key cannot be overridden`);
     }
 
-    await encryption.setJwtPublicKey(formId, pem.toString("base64"));
+    await encryption.setJwtPublicKey(formId, pem.toString("base64"), form.ttlTimestamp);
 
     return utils.success({success: true});
 

@@ -100,6 +100,11 @@ const sha256Hash = (str) => {
     return hash.digest().toString("base64");
 }
 
+const addTtl = (mode, obj) => {
+    if(mode === "TEST"){
+        obj.ttlTimestamp = Math.floor((new Date().getTime() + 1000*60*60*24*30)/1000);
+    }
+}
 
 module.exports = {
     success: success,
@@ -108,5 +113,6 @@ module.exports = {
     validate: validate,
     asyncLambda: asyncLambda,
     sha256Hash: sha256Hash,
-    qr: qr
+    qr: qr,
+    addTtl: addTtl
 }

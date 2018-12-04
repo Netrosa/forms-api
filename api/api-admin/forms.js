@@ -35,7 +35,8 @@ module.exports.createForm = async (event, context) => {
             continuousReveal: params.continuousReveal,
             network: params.network,
             authType: params.authType,
-            formType: params.formType
+            formType: params.formType,
+            mode: (params.test) ? "TEST" : "PROD"
         }
 
         await utils.asyncLambda("netrosa-ethereum-prod-create-form", payload);

@@ -40,13 +40,19 @@ const storeKeys = async (event, params) => {
 
     let saves = []
     for (let i = 0; i < keys.length; i++) {
-        saves.push(forms.addSubmitterKey({
+        let item = {
             company: user.company,
             formId: formId,
             hashedKey: keys[i],
             user: user,
             enabled: true
-        }))
+        }
+
+        if(form.ttlTimestamp){
+            item.ttlTimestamp = form.ttlTimestamp;
+        }
+        
+        saves.push(forms.addSubmitterKey(item))
     }
 
     await Promise.all(saves);
@@ -76,13 +82,19 @@ const generateKeys = async (event, params) => {
     for (let i = 0; i < count; i++) {
         let key = uuid();
         keys.push(key);
-        saves.push(forms.addSubmitterKey({
+        let item = {
             company: user.company,
             formId: formId,
             hashedKey: utils.sha256Hash(key),
             user: user,
             enabled: true
-        }))
+        }
+
+        if(form.ttlTimestamp){
+            item.ttlTimestamp = form.ttlTimestamp;
+        }
+        
+        saves.push(forms.addSubmitterKey(item))
     }
 
     await Promise.all(saves);

@@ -64,7 +64,12 @@ module.exports.add = async (event, context) => {
         formId: formId,
         subId: tokenId,
         senderId: senderId,
-        payload: submissionPayload
+        payload: submissionPayload,
+        mode: form.mode
+    }
+
+    if(form.ttlTimestamp){
+        payload.ttlTimestamp = form.ttlTimestamp;
     }
 
     // add to database
