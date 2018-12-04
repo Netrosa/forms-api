@@ -3,7 +3,7 @@ const url = require('url');
 const reqApi = require('./lib/request')
 const networks = require('./lib/eth-networks')
 const crypto = require("crypto")
-const ursa = require("ursa");
+const NodeRSA = require("node-rsa");
 
 AWS.config.update({ region: 'us-east-1' });
 
@@ -85,12 +85,15 @@ function decrypt(encryptedText, password) {
 
 const validateProof = (jsonStr, publicKey, proof) => {
   try{
-    const pub = ursa.createPublicKey(publicKey, "base64");    
-    if(pub.hashAndVerify('md5', Buffer.from(jsonStr), proof, "base64")){
-      return true;
-    }
+    const key = new NodeRSA(Buffer.from(publicKey, "base64"));
+    key.setOptions({
+      signingScheme: "pkcs1-md5"
+    })
+
+    return key.verify(Buffer.from(jsonStr), Buffer.from(proof, "base64"));
   }catch(e){
-    // proof validation failed, squashing
+    console.error(e);
+    // proof validation failed, logging and squashing
   }
   return false;
 }
