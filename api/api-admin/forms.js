@@ -5,8 +5,9 @@ const validations = require("../lib/validations")
 
 const FORM_SCHEMA = Joi.object().keys({
     name: Joi.string().required(),
-    formType: Joi.string().only("openrosa", "netrosa").default("netrosa"),
+    formType: Joi.string().only("openrosa", "netrosa", "file").default("netrosa"),
     form: Joi.alternatives()
+        .when('formType', { is: 'file', then: Joi.string() })
         .when('formType', { is: 'openrosa', then: Joi.string() })
         .when('formType', { is: 'netrosa', then: validations.FORM_SCHEMA }),
     continuousReveal: Joi.boolean().default(false),

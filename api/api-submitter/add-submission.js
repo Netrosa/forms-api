@@ -6,7 +6,7 @@ const submissions = require('../lib/submit-storage');
 const encryption = require('../lib/encryption')
 const Joi = require("joi")
 
-const netRosaSchema = Joi.object().keys({
+const netrosaSchema = Joi.object().keys({
     value: Joi.object().keys({
         signatureSeed: Joi.string().required()
     }).unknown(true).required(),
@@ -19,6 +19,13 @@ const openRosaSchema = Joi.object().keys({
     proof: Joi.string(),
     publicKey: Joi.string().base64()
 })
+
+
+const typeSchemas = {
+    "file": netrosaSchema,
+    "openrosa": openRosaSchema,
+    "netrosa": netrosaSchema
+}
 
 module.exports.add = async (event, context) => {
 
@@ -40,7 +47,11 @@ module.exports.add = async (event, context) => {
         return utils.error(409, {message: `form status is ${form.formStatus}`})
     }
 
-    let schema = (form.formType === "openrosa") ? openRosaSchema : netRosaSchema;
+    let schema = typeSchemas[form.formType]
+    if(!schema){
+        // shouldn't be possible, but just in case something crazy happens
+        return utils.error(409, {message: `invalid formType: ${form.formType}`})
+    }
     let params = await utils.validate(event.body, schema);
 
     //TODO: check signature if present

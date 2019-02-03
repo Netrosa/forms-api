@@ -1,0 +1,21 @@
+{
+  "name": "netclassify-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.19.0",
+    "file-encryptor": "^0.1.1",
+    "generate-password": "^1.4.1",
+    "netrosa-admin-sdk": "0.0.8",
+    "netrosa-public-sdk": "0.0.6"
+  },
+  "bin": {
+    "netclassify": "./cli.js"
+  }
+}

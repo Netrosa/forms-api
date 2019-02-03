@@ -123,7 +123,6 @@ const exportSubmissions = async (id, callback) => {
 
     let validProof = validateProof(decrypted, entry.publicKey, entry.proof);
     
-    //TODO: validate proof here
     cb({
       index: i,
       total: count,
@@ -214,6 +213,10 @@ module.exports = {
     checkReady();
     return await getDecryptionKey(id);
   },
+  GetForm: async (id) => {
+    checkReady();
+    return await get(`/form/${id}`)
+  },
   PollForStatus: async(id, status, timeout) => {
     checkReady();
     let now = new Date().getTime();
@@ -222,7 +225,7 @@ module.exports = {
     while(new Date().getTime() < expired){
       let job = await get(`/form/${id}`)
       if(job.formStatus === status){
-        return true;
+        return job;
       }
       //wait 2 seconds
       await snooze(2000);
